@@ -22,6 +22,7 @@ plugins {
   alias(libs.plugins.protobuf) apply false
   alias(libs.plugins.animalsniffer) apply false
   alias(libs.plugins.googleJavaFormat) apply false
+  id 'org.checkerframework' version '0.6.16' apply false
 }
 
 subprojects {
@@ -47,10 +48,17 @@ subprojects {
   }
 
   apply plugin: 'net.ltgt.errorprone'
+  apply plugin: 'org.checkerframework'
+  
+  checkerFramework {
+    checkers = ['org.checkerframework.checker.index.IndexChecker']
+  }
 
   dependencies {
     errorproneJavac libs.errorproneJavac
     errorprone libs.errorproneCore
+    checkerFramework 'org.checkerframework:checker:3.25.0'
+    implementation 'org.checkerframework:checker-qual:3.25.0'
   }
 
   tasks.withType(JavaCompile).configureEach { task ->
