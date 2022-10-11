@@ -1,0 +1,153 @@
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access by com.google.errorprone.util.ErrorProneTokens$CommentSavingTokenizer (file:/home/randall/.gradle/caches/modules-2/files-2.1/com.google.errorprone/error_prone_check_api/2.10.0/6203cac373051702c0cf8ca0bd36332fdc64903f/error_prone_check_api-2.10.0.jar) to field com.sun.tools.javac.parser.JavaTokenizer.reader
+WARNING: Please consider reporting this to the maintainers of com.google.errorprone.util.ErrorProneTokens$CommentSavingTokenizer
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release
+/mnt/c/Users/randa/Documents/LangCode/JavaCode/ResearchProject3/retrofit-resourceleakchecker/retrofit/src/main/java/retrofit2/Retrofit.java:165: error: [return] incompatible types in return.
+                    ? platform.invokeDefaultMethod(method, service, proxy, args)
+                    ^
+  type of expression: @MustCallUnknown Object
+  method return type: @MustCall Object
+/mnt/c/Users/randa/Documents/LangCode/JavaCode/ResearchProject3/retrofit-resourceleakchecker/retrofit/src/main/java/retrofit2/Utils.java:324: error: [required.method.not.called] @MustCall method close may not have been invoked on buffer or any of its aliases.
+    Buffer buffer = new Buffer();
+           ^
+  The type of object is: okio.Buffer.
+  Reason for going out of scope: possible exceptional exit due to body.source().readAll(buffer) with exception type java.io.IOException
+/mnt/c/Users/randa/Documents/LangCode/JavaCode/ResearchProject3/retrofit-resourceleakchecker/retrofit/src/main/java/retrofit2/Utils.java:325: error: [required.method.not.called] @MustCall method close may not have been invoked on temp-var-247 or any of its aliases.
+    body.source().readAll(buffer);
+               ^
+  The type of object is: okio.BufferedSource.
+  Reason for going out of scope: possible exceptional exit due to body.source().readAll(buffer) with exception type java.io.IOException
+/mnt/c/Users/randa/Documents/LangCode/JavaCode/ResearchProject3/retrofit-resourceleakchecker/retrofit/src/main/java/retrofit2/Response.java:36: error: [required.method.not.called] @MustCall method close may not have been invoked on temp-var-312 or any of its aliases.
+            .build());
+                  ^
+  The type of object is: okhttp3.Response.
+  Reason for going out of scope: regular method exit
+/mnt/c/Users/randa/Documents/LangCode/JavaCode/ResearchProject3/retrofit-resourceleakchecker/retrofit/src/main/java/retrofit2/Response.java:54: error: [required.method.not.called] @MustCall method close may not have been invoked on temp-var-324 or any of its aliases.
+            .build());
+                  ^
+  The type of object is: okhttp3.Response.
+  Reason for going out of scope: regular method exit
+/mnt/c/Users/randa/Documents/LangCode/JavaCode/ResearchProject3/retrofit-resourceleakchecker/retrofit/src/main/java/retrofit2/Response.java:71: error: [required.method.not.called] @MustCall method close may not have been invoked on temp-var-336 or any of its aliases.
+            .build());
+                  ^
+  The type of object is: okhttp3.Response.
+  Reason for going out of scope: regular method exit
+/mnt/c/Users/randa/Documents/LangCode/JavaCode/ResearchProject3/retrofit-resourceleakchecker/retrofit/src/main/java/retrofit2/Response.java:96: error: [required.method.not.called] @MustCall method close may not have been invoked on temp-var-346 or any of its aliases.
+            .body(new OkHttpCall.NoContentResponseBody(body.contentType(), body.contentLength()))
+                  ^
+  The type of object is: retrofit2.OkHttpCall.NoContentResponseBody.
+  Reason for going out of scope: regular method exit
+/mnt/c/Users/randa/Documents/LangCode/JavaCode/ResearchProject3/retrofit-resourceleakchecker/retrofit/src/main/java/retrofit2/Response.java:101: error: [required.method.not.called] @MustCall method close may not have been invoked on temp-var-355 or any of its aliases.
+            .build());
+                  ^
+  The type of object is: okhttp3.Response.
+  Reason for going out of scope: regular method exit
+/mnt/c/Users/randa/Documents/LangCode/JavaCode/ResearchProject3/retrofit-resourceleakchecker/retrofit/src/main/java/retrofit2/RequestBuilder.java:142: error: [required.method.not.called] @MustCall method close may not have been invoked on out or any of its aliases.
+        Buffer out = new Buffer();
+               ^
+  The type of object is: okio.Buffer.
+  Reason for going out of scope: regular method exit
+/mnt/c/Users/randa/Documents/LangCode/JavaCode/ResearchProject3/retrofit-resourceleakchecker/retrofit/src/main/java/retrofit2/RequestBuilder.java:143: error: [required.method.not.called] @MustCall method close may not have been invoked on temp-var-843 or any of its aliases.
+        out.writeUtf8(input, 0, i);
+                     ^
+  The type of object is: okio.Buffer.
+  Reason for going out of scope: regular method exit
+/mnt/c/Users/randa/Documents/LangCode/JavaCode/ResearchProject3/retrofit-resourceleakchecker/retrofit/src/main/java/retrofit2/RequestBuilder.java:168: error: [required.method.not.called] @MustCall method close may not have been invoked on utf8Buffer or any of its aliases.
+          utf8Buffer = new Buffer();
+                     ^
+  The type of object is: okio.Buffer.
+  Reason for going out of scope: regular method exit
+/mnt/c/Users/randa/Documents/LangCode/JavaCode/ResearchProject3/retrofit-resourceleakchecker/retrofit/src/main/java/retrofit2/RequestBuilder.java:170: error: [required.method.not.called] @MustCall method close may not have been invoked on temp-var-847 or any of its aliases.
+        utf8Buffer.writeUtf8CodePoint(codePoint);
+                                     ^
+  The type of object is: okio.Buffer.
+  Reason for going out of scope: regular method exit
+/mnt/c/Users/randa/Documents/LangCode/JavaCode/ResearchProject3/retrofit-resourceleakchecker/retrofit/src/main/java/retrofit2/RequestBuilder.java:173: error: [required.method.not.called] @MustCall method close may not have been invoked on temp-var-848 or any of its aliases.
+          out.writeByte('%');
+                       ^
+  The type of object is: okio.Buffer.
+  Reason for going out of scope: regular method exit
+/mnt/c/Users/randa/Documents/LangCode/JavaCode/ResearchProject3/retrofit-resourceleakchecker/retrofit/src/main/java/retrofit2/RequestBuilder.java:174: error: [required.method.not.called] @MustCall method close may not have been invoked on temp-var-849 or any of its aliases.
+          out.writeByte(HEX_DIGITS[(b >> 4) & 0xf]);
+                       ^
+  The type of object is: okio.Buffer.
+  Reason for going out of scope: regular method exit
+/mnt/c/Users/randa/Documents/LangCode/JavaCode/ResearchProject3/retrofit-resourceleakchecker/retrofit/src/main/java/retrofit2/RequestBuilder.java:175: error: [required.method.not.called] @MustCall method close may not have been invoked on temp-var-850 or any of its aliases.
+          out.writeByte(HEX_DIGITS[b & 0xf]);
+                       ^
+  The type of object is: okio.Buffer.
+  Reason for going out of scope: regular method exit
+/mnt/c/Users/randa/Documents/LangCode/JavaCode/ResearchProject3/retrofit-resourceleakchecker/retrofit/src/main/java/retrofit2/RequestBuilder.java:179: error: [required.method.not.called] @MustCall method close may not have been invoked on temp-var-851 or any of its aliases.
+        out.writeUtf8CodePoint(codePoint);
+                              ^
+  The type of object is: okio.Buffer.
+  Reason for going out of scope: regular method exit
+/mnt/c/Users/randa/Documents/LangCode/JavaCode/ResearchProject3/retrofit-resourceleakchecker/retrofit/src/main/java/retrofit2/OkHttpCall.java:204: error: [required.method.not.called] @MustCall method close may not have been invoked on temp-var-909 or any of its aliases.
+    return parseResponse(call.execute());
+                                     ^
+  The type of object is: okhttp3.Response.
+  Reason for going out of scope: possible exceptional exit due to parseResponse(call.execute()) with exception type java.io.IOException
+/mnt/c/Users/randa/Documents/LangCode/JavaCode/ResearchProject3/retrofit-resourceleakchecker/retrofit/src/main/java/retrofit2/OkHttpCall.java:216: error: [required.method.not.called] @MustCall method close may not have been invoked on rawBody or any of its aliases.
+    ResponseBody rawBody = rawResponse.body();
+                 ^
+  The type of object is: okhttp3.ResponseBody.
+  Reason for going out of scope: possible exceptional exit due to responseConverter.convert(catchingBody) with exception type java.io.IOException
+/mnt/c/Users/randa/Documents/LangCode/JavaCode/ResearchProject3/retrofit-resourceleakchecker/retrofit/src/main/java/retrofit2/OkHttpCall.java:219: error: [required.method.not.called] @MustCall method close may not have been invoked on rawResponse or any of its aliases.
+    rawResponse =
+                ^
+  The type of object is: okhttp3.Response.
+  Reason for going out of scope: regular method exit
+/mnt/c/Users/randa/Documents/LangCode/JavaCode/ResearchProject3/retrofit-resourceleakchecker/retrofit/src/main/java/retrofit2/OkHttpCall.java:222: error: [required.method.not.called] @MustCall method close may not have been invoked on temp-var-917 or any of its aliases.
+            .body(new NoContentResponseBody(rawBody.contentType(), rawBody.contentLength()))
+                  ^
+  The type of object is: retrofit2.OkHttpCall.NoContentResponseBody.
+  Reason for going out of scope: regular method exit
+/mnt/c/Users/randa/Documents/LangCode/JavaCode/ResearchProject3/retrofit-resourceleakchecker/retrofit/src/main/java/retrofit2/OkHttpCall.java:223: error: [assignment] incompatible types in assignment.
+            .build();
+                  ^
+  found   : @MustCall("close") Response
+  required: @MustCall Response
+/mnt/c/Users/randa/Documents/LangCode/JavaCode/ResearchProject3/retrofit-resourceleakchecker/retrofit/src/main/java/retrofit2/OkHttpCall.java:229: error: [required.method.not.called] @MustCall method close may not have been invoked on bufferedBody or any of its aliases.
+        ResponseBody bufferedBody = Utils.buffer(rawBody);
+                     ^
+  The type of object is: okhttp3.ResponseBody.
+  Reason for going out of scope: regular method exit
+/mnt/c/Users/randa/Documents/LangCode/JavaCode/ResearchProject3/retrofit-resourceleakchecker/retrofit/src/main/java/retrofit2/OkHttpCall.java:241: error: [required.method.not.called] @MustCall method close may not have been invoked on catchingBody or any of its aliases.
+    ExceptionCatchingResponseBody catchingBody = new ExceptionCatchingResponseBody(rawBody);
+                                  ^
+  The type of object is: retrofit2.OkHttpCall.ExceptionCatchingResponseBody.
+  Reason for going out of scope: possible exceptional exit due to responseConverter.convert(catchingBody) with exception type java.io.IOException
+/mnt/c/Users/randa/Documents/LangCode/JavaCode/ResearchProject3/retrofit-resourceleakchecker/retrofit/src/main/java/retrofit2/OkHttpCall.java:309: error: [required.method.not.called] @MustCall method close may not have been invoked on temp-var-935 or any of its aliases.
+          Okio.buffer(
+                     ^
+  The type of object is: okio.BufferedSource.
+  Reason for going out of scope: regular method exit
+/mnt/c/Users/randa/Documents/LangCode/JavaCode/ResearchProject3/retrofit-resourceleakchecker/retrofit/src/main/java/retrofit2/OkHttpCall.java:310: error: [required.method.not.called] @MustCall method close may not have been invoked on temp-var-934 or any of its aliases.
+              new ForwardingSource(delegate.source()) {
+              ^
+  The type of object is: <anonymous okio.ForwardingSource>.
+  Reason for going out of scope: regular method exit
+/mnt/c/Users/randa/Documents/LangCode/JavaCode/ResearchProject3/retrofit-resourceleakchecker/retrofit/src/main/java/retrofit2/OkHttpCall.java:310: error: [required.method.not.called] @MustCall method close may not have been invoked on temp-var-933 or any of its aliases.
+              new ForwardingSource(delegate.source()) {
+                                                  ^
+  The type of object is: okio.BufferedSource.
+  Reason for going out of scope: regular method exit
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+26 errors
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':retrofit:compileJava'.
+> Compilation failed; see the compiler error output for details.
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+
+* Get more help at https://help.gradle.org
+
+BUILD FAILED in 31s

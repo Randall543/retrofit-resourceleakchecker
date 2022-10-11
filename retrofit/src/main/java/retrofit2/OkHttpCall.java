@@ -29,6 +29,9 @@ import okio.BufferedSource;
 import okio.ForwardingSource;
 import okio.Okio;
 import okio.Timeout;
+import org.checkerframework.checker.mustcall.qual.*;
+import org.checkerframework.checker.calledmethods.qual.*;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
 final class OkHttpCall<T> implements Call<T> {
   private final RequestFactory requestFactory;

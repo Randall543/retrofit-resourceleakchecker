@@ -21,10 +21,14 @@ import okhttp3.Headers;
 import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.ResponseBody;
+import org.checkerframework.checker.mustcall.qual.*;
+import org.checkerframework.checker.calledmethods.qual.*;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
 /** An HTTP response. */
 public final class Response<T> {
   /** Create a synthetic successful response with {@code body} as the deserialized body. */
+  @SuppressWarnings("required.method.not.called") //oktthp3.Response is not meant to be closed since it will return. 
   public static <T> Response<T> success(@Nullable T body) {
     return success(
         body,
@@ -40,6 +44,11 @@ public final class Response<T> {
    * Create a synthetic successful response with an HTTP status code of {@code code} and {@code
    * body} as the deserialized body.
    */
+  /**
+   * resource should not be closed because it will need to be returned, therefore handled by the call site and not within the method. 
+   * An issue can occur if .build() throws an error. Perhaps a try-with-resource statement can resolve this?
+   */
+  @SuppressWarnings("required.method.not.called")
   public static <T> Response<T> success(int code, @Nullable T body) {
     if (code < 200 || code >= 300) {
       throw new IllegalArgumentException("code < 200 or >= 300: " + code);
@@ -58,6 +67,12 @@ public final class Response<T> {
    * Create a synthetic successful response using {@code headers} with {@code body} as the
    * deserialized body.
    */
+   /**
+   * resource should not be closed. Try-with-resource can help with possible .build() error.
+   * Object okhttp3.Response can be assigned to variable to have a reference to closed perhaps.
+   * @Owning should be default on methods therefore method call site should be reponsible for closing.  
+   */
+  @SuppressWarnings("required.method.not.called")
   public static <T> Response<T> success(@Nullable T body, Headers headers) {
     Objects.requireNonNull(headers, "headers == null");
     return success(
@@ -87,6 +102,12 @@ public final class Response<T> {
    * Create a synthetic error response with an HTTP status code of {@code code} and {@code body} as
    * the error body.
    */
+  /**
+   * Resource is meant to be returned and not closed. possible error in .body() and .build() can cause cause resource leak.
+   * regular method exit caused by OkHttp api. Resource closeure must be handled at method call site. method @Owning by default.
+   * Try-with-resource can be a solution.
+   */
+  @SuppressWarnings("required.method.not.called")
   public static <T> Response<T> error(int code, ResponseBody body) {
     Objects.requireNonNull(body, "body == null");
     if (code < 400) throw new IllegalArgumentException("code < 400: " + code);

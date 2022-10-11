@@ -32,6 +32,9 @@ import javax.annotation.Nullable;
 import kotlin.Unit;
 import okhttp3.ResponseBody;
 import okio.Buffer;
+import org.checkerframework.common.returnsreceiver.qual.This;
+import org.checkerframework.checker.mustcall.qual.*;
+import org.checkerframework.checker.calledmethods.qual.*;
 
 final class Utils {
   static final Type[] EMPTY_TYPE_ARRAY = new Type[0];
@@ -319,7 +322,10 @@ final class Utils {
     }
     return false;
   }
-
+  /**Real resource Leak
+   * buffer is out of scope if body.source().readALL(buffer) throws exception.
+   */
+  @SuppressWarnings("required.method.not.called")
   static ResponseBody buffer(final ResponseBody body) throws IOException {
     Buffer buffer = new Buffer();
     body.source().readAll(buffer);

@@ -27,6 +27,9 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okio.Buffer;
 import okio.BufferedSink;
+import org.checkerframework.checker.mustcall.qual.*;
+import org.checkerframework.checker.calledmethods.qual.*;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
 final class RequestBuilder {
   private static final char[] HEX_DIGITS = {
@@ -129,7 +132,10 @@ final class RequestBuilder {
     }
     relativeUrl = newRelativeUrl;
   }
-
+  /**
+   * Resource leak: 'Buffer out' is never closed within in either version of the overloaded method.
+   */
+  @SuppressWarnings("required.method.not.called")
   private static String canonicalizeForPath(String input, boolean alreadyEncoded) {
     int codePoint;
     for (int i = 0, limit = input.length(); i < limit; i += Character.charCount(codePoint)) {
@@ -149,7 +155,10 @@ final class RequestBuilder {
     // Fast path: no characters required encoding.
     return input;
   }
-
+  /**
+   * Resource leak: if 'Buffer utf8Buffer' is created then it is never closed within the overloaded method.
+  */
+  @SuppressWarnings("required.method.not.called")
   private static void canonicalizeForPath(
       Buffer out, String input, int pos, int limit, boolean alreadyEncoded) {
     Buffer utf8Buffer = null; // Lazily allocated.
