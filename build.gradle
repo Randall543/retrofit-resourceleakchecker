@@ -51,6 +51,9 @@ subprojects {
   apply plugin: 'org.checkerframework'
   
   checkerFramework {
+    extraJavacArgs = [
+      '-Astubs=/mnt/c/Users/randa/Documents/LangCode/JavaCode/ResearchProject3/retrofit-resourceleakchecker/file.astub'
+    ]
     checkers = ['org.checkerframework.checker.resourceleak.ResourceLeakChecker']
   }
 

@@ -1,0 +1,27 @@
+import org.checkerframework.checker.mustcall.qual.InheritableMustCall;
+import org.checkerframework.dataflow.qual.SideEffectFree;
+
+package okio;
+
+@InheritableMustCall({}) 
+class Buffer{
+
+}
+
+@InheritableMustCall({}) 
+class Sink{
+
+}
+
+@InheritableMustCall({}) 
+class Source{
+
+}
+
+@InheritableMustCall({})
+class Builder{
+    @SideEffectFree
+    public Response build(){
+
+    }
+}

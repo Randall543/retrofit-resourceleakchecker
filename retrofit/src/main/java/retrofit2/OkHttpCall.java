@@ -214,7 +214,6 @@ final class OkHttpCall<T> implements Call<T> {
     }
     return call;
   }
-
   Response<T> parseResponse(okhttp3.Response rawResponse) throws IOException {
     ResponseBody rawBody = rawResponse.body();
 
@@ -241,7 +240,7 @@ final class OkHttpCall<T> implements Call<T> {
       return Response.success(null, rawResponse);
     }
 
-    ExceptionCatchingResponseBody catchingBody = new ExceptionCatchingResponseBody(rawBody);
+    ExceptionCatchingResponseBody catchingBody = new ExceptionCatchingResponseBody(rawBody);  //Will this close the resource?
     try {
       T body = responseConverter.convert(catchingBody);
       return Response.success(body, rawResponse);
