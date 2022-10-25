@@ -324,6 +324,11 @@ final class Utils {
     }
     return false;
   }
+  /**
+   * Method readAll() could possibly have a resource leak however there seems to be no implementation of the interface?
+   * (file.astub:(line 13,col 1): Type not found: okio.BufferSource) warning message appears therefore readall() is not defined 
+   */
+   @SuppressWarnings("required.method.not.called")
   static ResponseBody buffer(final ResponseBody body) throws IOException {
     Buffer buffer = new Buffer();
     body.source().readAll(buffer);

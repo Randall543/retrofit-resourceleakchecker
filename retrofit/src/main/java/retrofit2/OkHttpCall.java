@@ -214,7 +214,11 @@ final class OkHttpCall<T> implements Call<T> {
     }
     return call;
   }
-  Response<T> parseResponse(okhttp3.Response rawResponse) throws IOException {
+  /**
+   * @owning parameter was added: method would seperate the resource [rawResponse.body()] from the parameter, extract information, insert information into new ResponseBody,
+   * and proceed to close the old resource when done succefully.
+   */
+  Response<T> parseResponse(@Owning okhttp3.Response rawResponse) throws IOException {
     ResponseBody rawBody = rawResponse.body();
 
     // Remove the body's source (the only stateful object) so we can pass the response along.
@@ -240,7 +244,7 @@ final class OkHttpCall<T> implements Call<T> {
       return Response.success(null, rawResponse);
     }
 
-    ExceptionCatchingResponseBody catchingBody = new ExceptionCatchingResponseBody(rawBody);  //Will this close the resource?
+    ExceptionCatchingResponseBody catchingBody = new ExceptionCatchingResponseBody(rawBody);
     try {
       T body = responseConverter.convert(catchingBody);
       return Response.success(body, rawResponse);
@@ -278,7 +282,7 @@ final class OkHttpCall<T> implements Call<T> {
   static final class NoContentResponseBody extends ResponseBody {
     private final @Nullable MediaType contentType;
     private final long contentLength;
-
+    @MustCallAlias
     NoContentResponseBody(@Nullable MediaType contentType, long contentLength) {
       this.contentType = contentType;
       this.contentLength = contentLength;

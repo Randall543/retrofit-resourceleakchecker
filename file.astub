@@ -1,27 +1,13 @@
-import org.checkerframework.checker.mustcall.qual.InheritableMustCall;
+import org.checkerframework.checker.mustcall.qual.*;
+import org.checkerframework.checker.calledmethods.qual.*;
 import org.checkerframework.dataflow.qual.SideEffectFree;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
 package okio;
-
+//close() is not implemented in the class with documentation (https://github.com/square/okio/blob/master/okio/src/commonMain/kotlin/okio/Buffer.kt)
 @InheritableMustCall({}) 
 class Buffer{
 
 }
 
-@InheritableMustCall({}) 
-class Sink{
 
-}
-
-@InheritableMustCall({}) 
-class Source{
-
-}
-
-@InheritableMustCall({})
-class Builder{
-    @SideEffectFree
-    public Response build(){
-
-    }
-}

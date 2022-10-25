@@ -8,6 +8,7 @@ local.properties
 .idea
 *.iml
 *.class
+OutputFiles
 # retrofit/bin/main/META-INF/proguard/retrofit2.pro
 # retrofit/bin/main/retrofit2/BuiltInConverters.class
 # retrofit/bin/main/retrofit2/BuiltInConverters$BufferingResponseBodyConverter.class

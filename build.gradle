@@ -52,7 +52,7 @@ subprojects {
   
   checkerFramework {
     extraJavacArgs = [
-      '-Astubs=/mnt/c/Users/randa/Documents/LangCode/JavaCode/ResearchProject3/retrofit-resourceleakchecker/file.astub'
+      '-Astubs=/mnt/c/Users/randa/Documents/LangCode/JavaCode/ResearchProject3/retrofit-resourceleakchecker'
     ]
     checkers = ['org.checkerframework.checker.resourceleak.ResourceLeakChecker']
   }
