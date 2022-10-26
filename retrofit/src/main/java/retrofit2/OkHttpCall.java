@@ -214,11 +214,7 @@ final class OkHttpCall<T> implements Call<T> {
     }
     return call;
   }
-  /**
-   * @owning parameter was added: method would seperate the resource [rawResponse.body()] from the parameter, extract information, insert information into new ResponseBody,
-   * and proceed to close the old resource when done succefully.
-   */
-  Response<T> parseResponse(@Owning okhttp3.Response rawResponse) throws IOException {
+  Response<T> parseResponse(okhttp3.Response rawResponse) throws IOException {
     ResponseBody rawBody = rawResponse.body();
 
     // Remove the body's source (the only stateful object) so we can pass the response along.
@@ -232,7 +228,7 @@ final class OkHttpCall<T> implements Call<T> {
     if (code < 200 || code >= 300) {
       try {
         // Buffer the entire body to avoid future I/O.
-        ResponseBody bufferedBody = Utils.buffer(rawBody);
+        ResponseBody bufferedBody = Utils.buffer(rawBody); //How do I relate the return method of Utils.buffer to bufferedBody without issue? 
         return Response.error(bufferedBody, rawResponse);
       } finally {
         rawBody.close();
