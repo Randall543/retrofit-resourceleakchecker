@@ -214,7 +214,7 @@ final class OkHttpCall<T> implements Call<T> {
     }
     return call;
   }
-  Response<T> parseResponse(okhttp3.Response rawResponse) throws IOException {
+  Response<T> parseResponse( okhttp3.Response rawResponse) throws IOException {
     ResponseBody rawBody = rawResponse.body();
 
     // Remove the body's source (the only stateful object) so we can pass the response along.
@@ -228,7 +228,7 @@ final class OkHttpCall<T> implements Call<T> {
     if (code < 200 || code >= 300) {
       try {
         // Buffer the entire body to avoid future I/O.
-        ResponseBody bufferedBody = Utils.buffer(rawBody); //How do I relate the return method of Utils.buffer to bufferedBody without issue? 
+        ResponseBody bufferedBody = Utils.buffer(rawBody); 
         return Response.error(bufferedBody, rawResponse);
       } finally {
         rawBody.close();

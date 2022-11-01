@@ -23,9 +23,12 @@ import okhttp3.Request;
 import okhttp3.ResponseBody;
 import org.checkerframework.checker.mustcall.qual.*;
 import org.checkerframework.checker.calledmethods.qual.*;
+import org.checkerframework.dataflow.qual.*;
 import org.checkerframework.common.returnsreceiver.qual.This;
 
+//This class holds resources but doesn't implement closable or close? These resources must still be closed.
 /** An HTTP response. */
+@MustCall("close")
 public final class Response<T> {
   /** Create a synthetic successful response with {@code body} as the deserialized body. */
   public static <T> Response<T> success(@Nullable T body) {
@@ -105,21 +108,21 @@ public final class Response<T> {
   }
 
   /** Create an error response from {@code rawResponse} with {@code body} as the error body. */
-  public static <T> Response<T> error(ResponseBody body, okhttp3.Response rawResponse) {
+  public static @MustCallAlias <T> Response<T> error( @MustCallAlias ResponseBody body, okhttp3.Response rawResponse) { // A rawResponse doesn't need to be closed. Holds no resource. 
     Objects.requireNonNull(body, "body == null");
     Objects.requireNonNull(rawResponse, "rawResponse == null");
     if (rawResponse.isSuccessful()) {
-      throw new IllegalArgumentException("rawResponse should not be successful response");
+      throw new IllegalArgumentException("rawResponse should not be successful response"); // This method is put into try-catch methods so it should be alright.
     }
-    return new Response<>(rawResponse, null, body);
+    return new Response<>(rawResponse, null, body); //body must still be closed some way, some how.
   }
 
-  private final okhttp3.Response rawResponse;
-  private final @Nullable T body;
-  private final @Nullable ResponseBody errorBody;
+  private final  okhttp3.Response rawResponse;
+  private final  @Nullable T body;
+  private final @Owning @Nullable ResponseBody errorBody;   //A response body should be have method closed() but this class doesn't extend closable.
 
-  private Response(
-      okhttp3.Response rawResponse, @Nullable T body, @Nullable ResponseBody errorBody) {
+  private  @MustCallAlias Response(
+     okhttp3.Response rawResponse,  @Nullable T body,  @Nullable  @MustCallAlias ResponseBody errorBody) { //perhaps This will allow the checker to connect the resources with the constructor.
     this.rawResponse = rawResponse;
     this.body = body;
     this.errorBody = errorBody;
@@ -156,7 +159,7 @@ public final class Response<T> {
   }
 
   /** The raw response body of an {@linkplain #isSuccessful() unsuccessful} response. */
-  public @Nullable ResponseBody errorBody() {
+  public @Nullable @MustCallAlias ResponseBody errorBody(Response<T> this) {
     return errorBody;
   }
 

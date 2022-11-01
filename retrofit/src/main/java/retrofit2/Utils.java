@@ -324,10 +324,6 @@ final class Utils {
     }
     return false;
   }
-/**
- *     static @MustCallAlias ResponseBody buffer(@MustCallAlias Utils this, final ResponseBody body) throws IOException {
- *   error message thrown when I try @MustCallAlias with this method.
- */
   static ResponseBody buffer(final ResponseBody body) throws IOException {  
     Buffer buffer = new Buffer();
     body.source().readAll(buffer);
