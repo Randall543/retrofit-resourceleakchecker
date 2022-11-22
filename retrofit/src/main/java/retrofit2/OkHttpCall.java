@@ -31,6 +31,8 @@ import okio.Okio;
 import okio.Timeout;
 import org.checkerframework.checker.mustcall.qual.*;
 import org.checkerframework.checker.calledmethods.qual.*;
+import org.checkerframework.framework.qual.*;
+import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.common.returnsreceiver.qual.This;
 
 final class OkHttpCall<T> implements Call<T> {
@@ -116,6 +118,7 @@ final class OkHttpCall<T> implements Call<T> {
   }
 
   @Override
+  @SuppressWarnings("required.method.not.called") //Response<T> response does not have "close" called on any of its resources, therefore this is a resource leak.
   public void enqueue(final Callback<T> callback) {
     Objects.requireNonNull(callback, "callback == null");
 
@@ -214,6 +217,7 @@ final class OkHttpCall<T> implements Call<T> {
     }
     return call;
   }
+  @SuppressWarnings("required.method.not.called") //ExceptionCatchingResponseBody catchingBody was not properly closed, therefore is a resource leak.
   Response<T> parseResponse( okhttp3.Response rawResponse) throws IOException {
     ResponseBody rawBody = rawResponse.body();
 
@@ -228,8 +232,8 @@ final class OkHttpCall<T> implements Call<T> {
     if (code < 200 || code >= 300) {
       try {
         // Buffer the entire body to avoid future I/O.
-        ResponseBody bufferedBody = Utils.buffer(rawBody); 
-        return Response.error(bufferedBody, rawResponse);
+        ResponseBody bufferedBody = Utils.buffer(rawBody);    //Resource Leak will occur and try-with resource should be used  
+        return Response.error(bufferedBody, rawResponse); 
       } finally {
         rawBody.close();
       }
@@ -242,7 +246,7 @@ final class OkHttpCall<T> implements Call<T> {
 
     ExceptionCatchingResponseBody catchingBody = new ExceptionCatchingResponseBody(rawBody);
     try {
-      T body = responseConverter.convert(catchingBody);
+      T body = responseConverter.convert(catchingBody); //Resource Leak: catching body will lose alias and go out of scope.
       return Response.success(body, rawResponse);
     } catch (RuntimeException e) {
       // If the underlying source threw an exception, propagate that rather than indicating it was
@@ -274,11 +278,13 @@ final class OkHttpCall<T> implements Call<T> {
       return rawCall != null && rawCall.isCanceled();
     }
   }
-
+  @MustCall({})
+  @SuppressWarnings("inconsistent.mustcall.subtype")  //Types of @MustCall({}) and @InheritableMustCall("close") are inconsistent, but child class has no need to be closed because there is no resource to close therefore this is a false positive.
   static final class NoContentResponseBody extends ResponseBody {
     private final @Nullable MediaType contentType;
     private final long contentLength;
-    @MustCallAlias
+
+    @SuppressWarnings("super.invocation") //The constructor @MustCall matches it's class.
     NoContentResponseBody(@Nullable MediaType contentType, long contentLength) {
       this.contentType = contentType;
       this.contentLength = contentLength;
@@ -299,12 +305,12 @@ final class OkHttpCall<T> implements Call<T> {
       throw new IllegalStateException("Cannot read raw response body of a converted body.");
     }
   }
-
+  
+  @SuppressWarnings("required.method.not.called") //Okio.buffer is an object with an Anonymous Inner Class. There is difficulty in communicating to the checker that the delegate and delegateSource are alias to the same resource.
   static final class ExceptionCatchingResponseBody extends ResponseBody {
     private final ResponseBody delegate;
     private final BufferedSource delegateSource;
     @Nullable IOException thrownException;
-
     ExceptionCatchingResponseBody(ResponseBody delegate) {
       this.delegate = delegate;
       this.delegateSource =

@@ -46,12 +46,12 @@ public final class NetworkBehavior {
   private static final int DEFAULT_VARIANCE_PERCENT = 40; // Network delay varies by ±40%.
   private static final int DEFAULT_FAILURE_PERCENT = 3; // 3% of network calls will fail.
   private static final int DEFAULT_ERROR_PERCENT = 0; // 0% of network calls will return errors.
-
+  
   /** Create an instance with default behavior. */
   public static NetworkBehavior create() {
     return new NetworkBehavior(new Random());
   }
-
+  
   /**
    * Create an instance with default behavior which uses {@code random} to control variance and
    * failure calculation.
@@ -61,16 +61,17 @@ public final class NetworkBehavior {
     if (random == null) throw new NullPointerException("random == null");
     return new NetworkBehavior(random);
   }
-
+  
   private final Random random;
-
+  
   private volatile long delayMs = DEFAULT_DELAY_MS;
   private volatile int variancePercent = DEFAULT_VARIANCE_PERCENT;
   private volatile int failurePercent = DEFAULT_FAILURE_PERCENT;
   private volatile Throwable failureException;
   private volatile int errorPercent = DEFAULT_ERROR_PERCENT;
+  @SuppressWarnings("required.method.not.called") //Annotation if fore errorFactory
   private volatile Callable<Response<?>> errorFactory =
-      () -> Response.error(500, ResponseBody.create(null, new byte[0]));
+      () -> Response.error(500, ResponseBody.create(null, new byte[0]));  //This is not a resource leak since this is a lambda expression for a functional interface. 
 
   private NetworkBehavior(Random random) {
     this.random = random;
@@ -157,6 +158,7 @@ public final class NetworkBehavior {
   }
 
   /** The HTTP error to be used when an error is triggered. */
+  @SuppressWarnings("required.method.not.called") //Resource Leak : If call is successful then it must be closed, but here it is not closed before throwing exception.
   public Response<?> createErrorResponse() {
     Response<?> call;
     try {
@@ -168,7 +170,7 @@ public final class NetworkBehavior {
       throw new IllegalStateException("Error factory returned null.");
     }
     if (call.isSuccessful()) {
-      throw new IllegalStateException("Error factory returned successful response.");
+      throw new IllegalStateException("Error factory returned successful response."); 
     }
     return call;
   }

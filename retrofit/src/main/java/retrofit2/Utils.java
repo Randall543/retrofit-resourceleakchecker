@@ -324,6 +324,7 @@ final class Utils {
     }
     return false;
   }
+  @SuppressWarnings("required.method.not.called")  // If readall throws an IOExecption then buffer will be left hanging without any alias, therefore this is a resource leak.
   static ResponseBody buffer(final ResponseBody body) throws IOException {  
     Buffer buffer = new Buffer();
     body.source().readAll(buffer);

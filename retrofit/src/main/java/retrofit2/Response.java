@@ -26,12 +26,12 @@ import org.checkerframework.checker.calledmethods.qual.*;
 import org.checkerframework.dataflow.qual.*;
 import org.checkerframework.common.returnsreceiver.qual.This;
 
-//This class holds resources but doesn't implement closable or close? These resources must still be closed.
 /** An HTTP response. */
-@MustCall("close")
+@MustCall("close")  // The class can hold resources in some instances and closed must be called on them.
+@SuppressWarnings("required.method.not.called")
 public final class Response<T> {
   /** Create a synthetic successful response with {@code body} as the deserialized body. */
-  public static <T> Response<T> success(@Nullable T body) {
+  public static <T> @MustCallAlias Response<T> success(@Nullable @MustCallAlias T body) {
     return success(
         body,
         new okhttp3.Response.Builder() //
@@ -81,10 +81,11 @@ public final class Response<T> {
    * Create a successful response from {@code rawResponse} with {@code body} as the deserialized
    * body.
    */
-  public static <T> Response<T> success(@Nullable T body, okhttp3.Response rawResponse) {
+  @SuppressWarnings("mustcallalias.out.of.scope") //Resource Leak : If exception is thrown then the only alias to body will be lost.
+  public static  <T> @MustCallAlias Response<T> success(@Nullable @MustCallAlias T body,  okhttp3.Response rawResponse) {
     Objects.requireNonNull(rawResponse, "rawResponse == null");
     if (!rawResponse.isSuccessful()) {
-      throw new IllegalArgumentException("rawResponse must be successful response");
+      throw new IllegalArgumentException("rawResponse must be successful response");  
     }
     return new Response<>(rawResponse, body, null);
   }
@@ -93,7 +94,8 @@ public final class Response<T> {
    * Create a synthetic error response with an HTTP status code of {@code code} and {@code body} as
    * the error body.
    */
-  public static <T> Response<T> error(int code, ResponseBody body) {
+  @SuppressWarnings("mustcallalias.out.of.scope") //resource leak due to exeption thrown and reference to body will be out of scope.
+  public static <T> @MustCallAlias Response<T> error(int code, @MustCallAlias ResponseBody body) {
     Objects.requireNonNull(body, "body == null");
     if (code < 400) throw new IllegalArgumentException("code < 400: " + code);
     return error(
@@ -108,21 +110,22 @@ public final class Response<T> {
   }
 
   /** Create an error response from {@code rawResponse} with {@code body} as the error body. */
-  public static @MustCallAlias <T> Response<T> error( @MustCallAlias ResponseBody body, okhttp3.Response rawResponse) { // A rawResponse doesn't need to be closed. Holds no resource. 
+  @SuppressWarnings("mustcallalias.out.of.scope") //resource leak due to exeption thrown and reference to body will be out of scope.
+  public static  <T> @MustCallAlias Response<T> error( @MustCallAlias ResponseBody body, okhttp3.Response rawResponse) { // A rawResponse doesn't need to be closed. Holds no resource. 
     Objects.requireNonNull(body, "body == null");
     Objects.requireNonNull(rawResponse, "rawResponse == null");
     if (rawResponse.isSuccessful()) {
-      throw new IllegalArgumentException("rawResponse should not be successful response"); // This method is put into try-catch methods so it should be alright.
+      throw new IllegalArgumentException("rawResponse should not be successful response"); // This will cause a resource leak
     }
     return new Response<>(rawResponse, null, body); //body must still be closed some way, some how.
   }
 
   private final  okhttp3.Response rawResponse;
-  private final  @Nullable T body;
-  private final @Owning @Nullable ResponseBody errorBody;   //A response body should be have method closed() but this class doesn't extend closable.
-
-  private  @MustCallAlias Response(
-     okhttp3.Response rawResponse,  @Nullable T body,  @Nullable  @MustCallAlias ResponseBody errorBody) { //perhaps This will allow the checker to connect the resources with the constructor.
+  private final  @Nullable @Owning T body;  //
+  private final  @Nullable @Owning ResponseBody errorBody;  //The class does not have a close method but Responsebody does have one. No way to tell checker the close() method exists outside the class. A method named "close" should be added as a more direct way to close the resource.
+  
+  private @MustCallAlias Response(
+     okhttp3.Response rawResponse,  @Nullable @MustCallAlias T body, @Nullable @MustCallAlias ResponseBody errorBody) {
     this.rawResponse = rawResponse;
     this.body = body;
     this.errorBody = errorBody;
@@ -159,7 +162,7 @@ public final class Response<T> {
   }
 
   /** The raw response body of an {@linkplain #isSuccessful() unsuccessful} response. */
-  public @Nullable @MustCallAlias ResponseBody errorBody(Response<T> this) {
+  public @Nullable @MustCallAlias ResponseBody errorBody( @MustCallAlias Response<T> this ) { //Calling close on the ResponseBody returned by errorBody() will ensure the resource in Response<T> will be closed.
     return errorBody;
   }
 

@@ -42,6 +42,10 @@ import retrofit2.http.GET;
 import retrofit2.http.HTTP;
 import retrofit2.http.Header;
 import retrofit2.http.Url;
+import org.checkerframework.checker.mustcall.qual.*;
+import org.checkerframework.checker.calledmethods.qual.*;
+import org.checkerframework.dataflow.qual.*;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
 /**
  * Retrofit adapts a Java interface to HTTP calls by using annotations on the declared methods to
@@ -63,6 +67,7 @@ import retrofit2.http.Url;
  * @author Bob Lee (bob@squareup.com)
  * @author Jake Wharton (jw@squareup.com)
  */
+@SuppressWarnings("return") 
 public final class Retrofit {
   private final Map<Method, ServiceMethod<?>> serviceMethodCache = new ConcurrentHashMap<>();
 
@@ -420,7 +425,7 @@ public final class Retrofit {
     return callbackExecutor;
   }
 
-  public Builder newBuilder() {
+  public Builder newBuilder() { //this makes a shallow-copy of the builder that calls it.
     return new Builder(this);
   }
 

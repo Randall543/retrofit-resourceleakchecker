@@ -4,10 +4,19 @@ import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.common.returnsreceiver.qual.This;
 
 package okio;
-//close() is not implemented in the class with documentation (https://github.com/square/okio/blob/master/okio/src/commonMain/kotlin/okio/Buffer.kt)
-@InheritableMustCall({}) 
 class Buffer{
+    public @MustCallAlias BufferedSource buffer(@MustCallAlias Buffer this);
+    public @MustCallAlias BufferedSource buffer(@MustCallAlias Object this);
+}
 
+class ForwardingSource{
+    public @MustCallAlias ForwardingSource(@MustCallAlias Source delegate);
+}
+
+
+interface BufferedSource{
+    
+    // Long readall();
 }
 
 

@@ -132,6 +132,7 @@ final class RequestBuilder {
     }
     relativeUrl = newRelativeUrl;
   }
+  @SuppressWarnings("required.method.not.called") //The "Buffer out" resource is open even after the end of the method, therfore this is a resource leak
   private static String canonicalizeForPath(String input, boolean alreadyEncoded) {
     int codePoint;
     for (int i = 0, limit = input.length(); i < limit; i += Character.charCount(codePoint)) {
@@ -151,6 +152,7 @@ final class RequestBuilder {
     // Fast path: no characters required encoding.
     return input;
   }
+  @SuppressWarnings("required.method.not.called") // Buffer utf8Buffer is not closed therefore it is a resource leak. The method 'writeUtf8CodePoint' doesn't close the buffer either.
   private static void canonicalizeForPath(
       Buffer out, String input, int pos, int limit, boolean alreadyEncoded) {
     Buffer utf8Buffer = null; // Lazily allocated.
