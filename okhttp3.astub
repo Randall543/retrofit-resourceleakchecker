@@ -10,6 +10,8 @@ package okhttp3;
 class Response{
     @Owning ResponseBody body;
 
+
+    @MustCallAlias Request request(@MustCallAlias Response this);
     @MustCallAlias ResponseBody body(@MustCallAlias Response this);
     @MustCallAlias Response.Builder newBuilder(@MustCallAlias Response this); //This is used to connected the shallow-copy created to the Builder Constructor.
 

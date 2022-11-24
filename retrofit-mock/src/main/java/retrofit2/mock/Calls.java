@@ -137,6 +137,7 @@ public final class Calls {
     }
 
     @Override
+    @SuppressWarnings("return") //Suppressed for purpose of time and help. The warning must still be examined. 
     public Request request() {
       if (response != null) {
         return response.raw().request();

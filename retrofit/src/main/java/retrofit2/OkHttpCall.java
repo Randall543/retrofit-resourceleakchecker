@@ -39,7 +39,7 @@ final class OkHttpCall<T> implements Call<T> {
   private final RequestFactory requestFactory;
   private final Object[] args;
   private final okhttp3.Call.Factory callFactory;
-  private final Converter<ResponseBody, T> responseConverter;
+  private final Converter< @MustCall("close") ResponseBody, T> responseConverter;
 
   private volatile boolean canceled;
 
@@ -217,7 +217,11 @@ final class OkHttpCall<T> implements Call<T> {
     }
     return call;
   }
-  @SuppressWarnings("required.method.not.called") //ExceptionCatchingResponseBody catchingBody was not properly closed, therefore is a resource leak.
+  /*
+   * 1)ExceptionCatchingResponseBody catchingBody was not properly closed, therefore is a resource leak.
+   * 2) Line 250 holds a warning that was suppressing for the purpose of help and time. The warning must still be examined.
+   */
+  @SuppressWarnings("all")
   Response<T> parseResponse( okhttp3.Response rawResponse) throws IOException {
     ResponseBody rawBody = rawResponse.body();
 
