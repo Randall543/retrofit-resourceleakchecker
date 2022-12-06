@@ -23,6 +23,10 @@ import com.google.gson.stream.JsonToken;
 import java.io.IOException;
 import okhttp3.ResponseBody;
 import retrofit2.Converter;
+import org.checkerframework.checker.mustcall.qual.*;
+import org.checkerframework.checker.calledmethods.qual.*;
+import org.checkerframework.dataflow.qual.SideEffectFree;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
 final class GsonResponseBodyConverter<T> implements Converter<ResponseBody, T> {
   private final Gson gson;
@@ -43,7 +47,7 @@ final class GsonResponseBodyConverter<T> implements Converter<ResponseBody, T> {
       }
       return result;
     } finally {
-      value.close();
+      value.close();  //value.charstream() should already close value? (perhaps this is here because of a possible exception?)
     }
   }
 }

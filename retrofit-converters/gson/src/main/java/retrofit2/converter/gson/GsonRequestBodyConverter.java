@@ -27,6 +27,12 @@ import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okio.Buffer;
 import retrofit2.Converter;
+import org.checkerframework.checker.mustcall.qual.*;
+import org.checkerframework.checker.calledmethods.qual.*;
+import org.checkerframework.dataflow.qual.SideEffectFree;
+import org.checkerframework.common.returnsreceiver.qual.This;
+import org.checkerframework.framework.qual.*;
+
 
 final class GsonRequestBodyConverter<T> implements Converter<T, RequestBody> {
   private static final MediaType MEDIA_TYPE = MediaType.get("application/json; charset=UTF-8");
@@ -40,6 +46,7 @@ final class GsonRequestBodyConverter<T> implements Converter<T, RequestBody> {
   }
 
   @Override
+  @SuppressWarnings("calledmethods:required.method.not.called") // resource leak is possible if gson.newJsonWriter(writer) throws an exception, therefore a resourceleak will occur.
   public RequestBody convert(T value) throws IOException {
     Buffer buffer = new Buffer();
     Writer writer = new OutputStreamWriter(buffer.outputStream(), UTF_8);

@@ -4,10 +4,12 @@ import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.common.returnsreceiver.qual.This;
 import org.checkerframework.framework.qual.*;
 
-package com.google.gson;
+package com.squareup.moshi;
 
-class Gson{
-    public @MustCallAlias JsonWriter newJsonWriter(@MustCallAlias Writer writer);
-    public @MustCallAlias JsonReader newJsonReader(@MustCallAlias Reader reader);
-}
+// class JsonWriter{
+//     public @MustCallAlias JsonWriter of(@MustCallAlias okio.BufferedSource sink);
+// }
 
+// class JsonAdapter<T>{
+//     public void toJson(okio.BufferedSink sink, T value);
+// }
