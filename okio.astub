@@ -4,19 +4,16 @@ import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.common.returnsreceiver.qual.This;
 
 package okio;
+
+class Okio{
+    public @MustCallAlias BufferedSource buffer(@MustCallAlias Source source);
+}
+
 class Buffer{
-    public @MustCallAlias BufferedSource buffer(@MustCallAlias Buffer this);
-    public @MustCallAlias BufferedSource buffer(@MustCallAlias Object this);
+    // public @MustCallAlias BufferedSource buffer(@MustCallAlias Buffer this);
+    // public @MustCallAlias BufferedSource buffer(@MustCallAlias Object this);
 }
 
 class ForwardingSource{
     public @MustCallAlias ForwardingSource(@MustCallAlias Source delegate);
 }
-
-
-interface BufferedSource{
-    
-    // Long readall();
-}
-
-

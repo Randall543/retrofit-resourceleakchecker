@@ -39,7 +39,7 @@ final class OkHttpCall<T> implements Call<T> {
   private final RequestFactory requestFactory;
   private final Object[] args;
   private final okhttp3.Call.Factory callFactory;
-  private final Converter< @MustCall("close") ResponseBody, T> responseConverter;
+  private final Converter<ResponseBody, T> responseConverter;
 
   private volatile boolean canceled;
 
@@ -118,13 +118,12 @@ final class OkHttpCall<T> implements Call<T> {
   }
 
   @Override
-  @SuppressWarnings("required.method.not.called") //Response<T> response does not have "close" called on any of its resources, therefore this is a resource leak.
   public void enqueue(final Callback<T> callback) {
     Objects.requireNonNull(callback, "callback == null");
-
+    
     okhttp3.Call call;
     Throwable failure;
-
+    
     synchronized (this) {
       if (executed) throw new IllegalStateException("Already executed.");
       executed = true;
@@ -140,19 +139,19 @@ final class OkHttpCall<T> implements Call<T> {
         }
       }
     }
-
+    
     if (failure != null) {
       callback.onFailure(this, failure);
       return;
     }
-
+    
     if (canceled) {
       call.cancel();
     }
-
     call.enqueue(
-        new okhttp3.Callback() {
-          @Override
+      new okhttp3.Callback() {
+        @Override
+        @SuppressWarnings("calledmethods:required.method.not.called") //Response<T> response will go out scope through callback.onResponse() does not take responsiblity for closing response and the resource will still be active. This is also anonymous class therefore there is no way to alias the constructor and response .//https://javadoc.io/doc/com.squareup.okhttp3/okhttp/3.14.9/okhttp3/Callback.html
           public void onResponse(okhttp3.Call call, okhttp3.Response rawResponse) {
             Response<T> response;
             try {
@@ -217,11 +216,14 @@ final class OkHttpCall<T> implements Call<T> {
     }
     return call;
   }
-  /*
-   * 1)ExceptionCatchingResponseBody catchingBody was not properly closed, therefore is a resource leak.
-   * 2) Line 250 holds a warning that was suppressing for the purpose of help and time. The warning must still be examined.
+  /**
+   *  error: [return] incompatible types in return.
+      return Response.success(body, rawResponse);
+                             ^
+  type of expression: @MustCallUnknown Response<T extends @MustCallUnknown Object>
+  method return type: @MustCall("close") Response<T extends @MustCallUnknown Object>
    */
-  @SuppressWarnings("all")
+  @SuppressWarnings("mustcall:return")  //The checker has trouble handling generics. This is a false positive.
   Response<T> parseResponse( okhttp3.Response rawResponse) throws IOException {
     ResponseBody rawBody = rawResponse.body();
 
@@ -236,7 +238,7 @@ final class OkHttpCall<T> implements Call<T> {
     if (code < 200 || code >= 300) {
       try {
         // Buffer the entire body to avoid future I/O.
-        ResponseBody bufferedBody = Utils.buffer(rawBody);    //Resource Leak will occur and try-with resource should be used  
+        ResponseBody bufferedBody = Utils.buffer(rawBody); 
         return Response.error(bufferedBody, rawResponse); 
       } finally {
         rawBody.close();
@@ -250,7 +252,7 @@ final class OkHttpCall<T> implements Call<T> {
 
     ExceptionCatchingResponseBody catchingBody = new ExceptionCatchingResponseBody(rawBody);
     try {
-      T body = responseConverter.convert(catchingBody); //Resource Leak: catching body will lose alias and go out of scope.
+      T body = responseConverter.convert(catchingBody); // this method essentially converts Responsebody to ExceptionCatchingResponseBody
       return Response.success(body, rawResponse);
     } catch (RuntimeException e) {
       // If the underlying source threw an exception, propagate that rather than indicating it was
@@ -283,12 +285,12 @@ final class OkHttpCall<T> implements Call<T> {
     }
   }
   @MustCall({})
-  @SuppressWarnings("inconsistent.mustcall.subtype")  //Types of @MustCall({}) and @InheritableMustCall("close") are inconsistent, but child class has no need to be closed because there is no resource to close therefore this is a false positive.
+  @SuppressWarnings("mustcall:inconsistent.mustcall.subtype")  //Types of @MustCall({}) and @InheritableMustCall("close") are inconsistent, but child class has no need to be closed because there is no resource to close therefore this is a false positive.
   static final class NoContentResponseBody extends ResponseBody {
     private final @Nullable MediaType contentType;
     private final long contentLength;
 
-    @SuppressWarnings("super.invocation") //The constructor @MustCall matches it's class.
+    @SuppressWarnings("mustcall:super.invocation") //The constructor @MustCall must match it's class.
     NoContentResponseBody(@Nullable MediaType contentType, long contentLength) {
       this.contentType = contentType;
       this.contentLength = contentLength;
@@ -309,17 +311,17 @@ final class OkHttpCall<T> implements Call<T> {
       throw new IllegalStateException("Cannot read raw response body of a converted body.");
     }
   }
-  
-  @SuppressWarnings("required.method.not.called") //Okio.buffer is an object with an Anonymous Inner Class. There is difficulty in communicating to the checker that the delegate and delegateSource are alias to the same resource.
   static final class ExceptionCatchingResponseBody extends ResponseBody {
-    private final ResponseBody delegate;
+    private final @Owning ResponseBody delegate;
     private final BufferedSource delegateSource;
     @Nullable IOException thrownException;
-    ExceptionCatchingResponseBody(ResponseBody delegate) {
+    @SuppressWarnings("mustcall:annotations.on.use") //Resource leak checker can not handle this situation. The Type and annotation are inconsistent due to anonymous class. [error: [annotations.on.use] invalid type: annotations [@PolyMustCall] conflict with declaration of type retrofit2.OkHttpCall.ExceptionCatchingResponseBody]
+    @MustCallAlias ExceptionCatchingResponseBody(@MustCallAlias ResponseBody delegate) {
       this.delegate = delegate;
       this.delegateSource =
           Okio.buffer(
-              new ForwardingSource(delegate.source()) {
+              new ForwardingSource(delegate.source()) 
+              {
                 @Override
                 public long read(Buffer sink, long byteCount) throws IOException {
                   try {
@@ -346,8 +348,9 @@ final class OkHttpCall<T> implements Call<T> {
     public BufferedSource source() {
       return delegateSource;
     }
-
+    
     @Override
+    @EnsuresCalledMethods(value = "delegate", methods = "close")
     public void close() {
       delegate.close();
     }

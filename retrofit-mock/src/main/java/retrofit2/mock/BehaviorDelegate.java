@@ -54,9 +54,9 @@ public final class BehaviorDelegate<T> {
   public T returningResponse(@Nullable Object response) {
     return returning(Calls.response(response));
   }
-
-  // @SuppressWarnings("unchecked") // Single-interface proxy creation guarded by parameter safety.
-  @SuppressWarnings("all")  //suprressing warnings for that are not resource leak checker. Ask Questions about this.
+// ["mustcall:return"] is needed due to resource leak checker not being able to handle generics in [return adapted;]
+// [argument] The resource leak checker can not handle Kotlinextensions at this time.
+  @SuppressWarnings(value = {"unchecked","mustcall:return","mustcall:argument"}) // Single-interface proxy creation guarded by parameter safety.
   public <R> T returning(Call<R> call) {
     final Call<R> behaviorCall = new BehaviorCall<>(behavior, executor, call);
     return (T)

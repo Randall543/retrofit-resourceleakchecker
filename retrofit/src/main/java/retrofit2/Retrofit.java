@@ -67,7 +67,15 @@ import org.checkerframework.common.returnsreceiver.qual.This;
  * @author Bob Lee (bob@squareup.com)
  * @author Jake Wharton (jw@squareup.com)
  */
-@SuppressWarnings("return") 
+/*  
+ * /mnt/c/Users/randa/Documents/LangCode/JavaCode/ResearchProject3/retrofit-resourceleakchecker/retrofit/src/main/java/retrofit2/Retrofit.java:170: error: [return] incompatible types in return.
+                    ? platform.invokeDefaultMethod(method, service, proxy, args)
+                    ^
+  type of expression: @MustCallUnknown Object
+  method return type: @MustCall Object
+
+ */
+// @SuppressWarnings("return") //Warning description is shown above
 public final class Retrofit {
   private final Map<Method, ServiceMethod<?>> serviceMethodCache = new ConcurrentHashMap<>();
 
@@ -156,8 +164,9 @@ public final class Retrofit {
             new Class<?>[] {service},
             new InvocationHandler() {
               private final Object[] emptyArgs = new Object[0];
-
+              
               @Override
+              @SuppressWarnings("mustcall:return") // Suppressed due to [error: [return] incompatible types in return.] and resource leak checker does not handle this warning. (Discussed with professor already).
               public @Nullable Object invoke(Object proxy, Method method, @Nullable Object[] args)
                   throws Throwable {
                 // If the method is a method from Object then defer to normal invocation.

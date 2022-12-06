@@ -89,7 +89,7 @@ final class BehaviorCall<T> implements Call<T> {
               }
 
               @Override
-              @SuppressWarnings("required.method.not.called") //Resource Leak : behavior.createErrorResponse() was casted as a Response<T> and it will become a error Response, therefore it will hold a responseBody that must be closed.
+              @SuppressWarnings("calledmethods:required.method.not.called") //This is a false positive because .createErrorResponse() will create a Response without a resource. THe cast (Response<T>) causes the checker to throw a warning but this is an exception.
               public void run() {
                 if (canceled) {
                   callback.onFailure(BehaviorCall.this, new IOException("canceled"));
