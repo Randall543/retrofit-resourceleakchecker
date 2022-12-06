@@ -10,8 +10,7 @@ class Okio{
 }
 
 class Buffer{
-    // public @MustCallAlias BufferedSource buffer(@MustCallAlias Buffer this);
-    // public @MustCallAlias BufferedSource buffer(@MustCallAlias Object this);
+    public @MustCallAlias java.io.OutputStream outputStream(@MustCallAlias Buffer this);
 }
 
 class ForwardingSource{
