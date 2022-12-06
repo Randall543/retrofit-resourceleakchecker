@@ -6,10 +6,10 @@ import org.checkerframework.framework.qual.*;
 
 package com.squareup.moshi;
 
-// class JsonWriter{
-//     public @MustCallAlias JsonWriter of(@MustCallAlias okio.BufferedSource sink);
-// }
+class JsonWriter{
+    public @MustCallAlias JsonWriter of(@MustCallAlias okio.BufferedSource sink);
+}
 
-// class JsonAdapter<T>{
-//     public void toJson(okio.BufferedSink sink, T value);
-// }
+class JsonAdapter<T>{
+    public void toJson(okio.BufferedSink sink, T value);
+}
