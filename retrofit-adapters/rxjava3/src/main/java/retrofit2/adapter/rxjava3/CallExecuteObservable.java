@@ -23,6 +23,11 @@ import io.reactivex.rxjava3.exceptions.Exceptions;
 import io.reactivex.rxjava3.plugins.RxJavaPlugins;
 import retrofit2.Call;
 import retrofit2.Response;
+import org.checkerframework.checker.mustcall.qual.*;
+import org.checkerframework.checker.calledmethods.qual.*;
+import org.checkerframework.dataflow.qual.SideEffectFree;
+import org.checkerframework.common.returnsreceiver.qual.This;
+import org.checkerframework.framework.qual.*;
 
 final class CallExecuteObservable<T> extends Observable<Response<T>> {
   private final Call<T> originalCall;
@@ -43,6 +48,7 @@ final class CallExecuteObservable<T> extends Observable<Response<T>> {
 
     boolean terminated = false;
     try {
+      @SuppressWarnings("calledmethods:required.method.not.called") // response is was not closed, therefore this is a resource leak. (review for further investigation)
       Response<T> response = call.execute();
       if (!disposable.isDisposed()) {
         observer.onNext(response);
