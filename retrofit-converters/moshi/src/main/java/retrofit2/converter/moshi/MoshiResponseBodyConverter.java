@@ -39,8 +39,7 @@ final class MoshiResponseBodyConverter<T> implements Converter<ResponseBody, T> 
   }
 
   @Override
-  @SuppressWarnings("calledmethods:required.method.not.called") //source and reader are aliases to the same resource, therefore value.close() will close the resource for both objects.
-  public T convert(ResponseBody value) throws IOException {
+  public T convert(@Owning ResponseBody value) throws IOException {
     BufferedSource source = value.source();
     try {
       // Moshi has no document-level API so the responsibility of BOM skipping falls to whatever

@@ -10,8 +10,9 @@ package okhttp3;
 class Response{
     @Owning ResponseBody body;
 
-
-    @MustCallAlias Request request(@MustCallAlias Response this);
+    @MustCall({})   //a okhttp3.Request does not need to be closed because it holds no resource.
+    Request request(Response this);
+    
     @MustCallAlias ResponseBody body(@MustCallAlias Response this);
     @MustCallAlias Response.Builder newBuilder(@MustCallAlias Response this); //This is used to connected the shallow-copy created to the Builder Constructor.
 
@@ -68,4 +69,5 @@ class Call{
     //  Used to associated the Response field variable in Call with the Response object returned by the method.
     @MustCallAlias Response execute(@MustCallAlias Call this);
 }
+
 

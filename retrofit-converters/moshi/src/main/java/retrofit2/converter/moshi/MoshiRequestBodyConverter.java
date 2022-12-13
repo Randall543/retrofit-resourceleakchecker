@@ -36,9 +36,13 @@ final class MoshiRequestBodyConverter<T> implements Converter<T, RequestBody> {
   MoshiRequestBodyConverter(JsonAdapter<T> adapter) {
     this.adapter = adapter;
   }
-
+/*
+ * [required.method.not.called] Resource leak can occur if adapter.toJason(writer,value) throws an exception.
+ * The resource leak checker is not able to handle this situation since adapter.toJson is dependent on the implementation of the type given to adapter. This is attributed to the use of generics.
+ * It is certain closed has not been called on buffer or writer.
+ */
   @Override
-  @SuppressWarnings("calledmethods:required.method.not.called") // Resource leak can occur if adapter.toJason(writer,value) throws an exception.  
+  @SuppressWarnings("calledmethods:required.method.not.called")
   public RequestBody convert(T value) throws IOException {
     Buffer buffer = new Buffer();
     JsonWriter writer = JsonWriter.of(buffer);

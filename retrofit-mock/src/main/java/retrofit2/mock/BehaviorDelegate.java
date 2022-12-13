@@ -54,6 +54,7 @@ public final class BehaviorDelegate<T> {
   public T returningResponse(@Nullable Object response) {
     return returning(Calls.response(response));
   }
+// Below are both false positives
 // ["mustcall:return"] is needed due to resource leak checker not being able to handle generics in [return adapted;]
 // [argument] The resource leak checker can not handle Kotlinextensions at this time.
   @SuppressWarnings(value = {"unchecked","mustcall:return","mustcall:argument"}) // Single-interface proxy creation guarded by parameter safety.

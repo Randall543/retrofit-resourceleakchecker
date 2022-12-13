@@ -38,7 +38,7 @@ final class GsonResponseBodyConverter<T> implements Converter<ResponseBody, T> {
   }
 
   @Override
-  public T convert(ResponseBody value) throws IOException {
+  public T convert(@Owning ResponseBody value) throws IOException {
     JsonReader jsonReader = gson.newJsonReader(value.charStream());
     try {
       T result = adapter.read(jsonReader);
@@ -47,7 +47,7 @@ final class GsonResponseBodyConverter<T> implements Converter<ResponseBody, T> {
       }
       return result;
     } finally {
-      value.close();  //value.charstream() should already close value? (perhaps this is here because of a possible exception?)
+      value.close();
     }
   }
 }

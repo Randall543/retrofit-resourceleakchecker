@@ -223,7 +223,7 @@ final class OkHttpCall<T> implements Call<T> {
   type of expression: @MustCallUnknown Response<T extends @MustCallUnknown Object>
   method return type: @MustCall("close") Response<T extends @MustCallUnknown Object>
    */
-  @SuppressWarnings("mustcall:return")  //The checker has trouble handling generics. This is a false positive.
+  @SuppressWarnings("mustcall:return")  //The checker has trouble handling generics. This is a false positive.  Review.
   Response<T> parseResponse( okhttp3.Response rawResponse) throws IOException {
     ResponseBody rawBody = rawResponse.body();
 

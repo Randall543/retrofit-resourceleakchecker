@@ -69,7 +69,8 @@ public final class NetworkBehavior {
   private volatile int failurePercent = DEFAULT_FAILURE_PERCENT;
   private volatile Throwable failureException;
   private volatile int errorPercent = DEFAULT_ERROR_PERCENT;
-  @SuppressWarnings("calledmethods:required.method.not.called") //Annotation is for errorFactory
+  // @SuppressWarnings(values ={"resourceleak:required.method.not.called","resourceleak:return"}) The resource leak descriptor does not work for some odd reason? 
+  @SuppressWarnings(value={"calledmethods:required.method.not.called","mustcall:return"}) //Annotation is for errorFactory
   private volatile Callable<Response<?>> errorFactory =
       () -> Response.error(500, ResponseBody.create(null, new byte[0]));  //This is not a resource leak since this is a lambda expression for a functional interface. 
 

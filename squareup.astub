@@ -13,3 +13,7 @@ class JsonWriter{
 class JsonAdapter<T>{
     public void toJson(okio.BufferedSink sink, T value);
 }
+
+class JsonReader{
+    static @MustCallAlias JsonReader of(@MustCallAlias okio.BufferedSource source);
+}

@@ -39,6 +39,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 import retrofit2.converter.simplexml.SimpleXmlConverterFactory;
 import retrofit2.http.GET;
+import org.checkerframework.checker.mustcall.qual.*;
+import org.checkerframework.checker.calledmethods.qual.*;
+import org.checkerframework.dataflow.qual.SideEffectFree;
+import org.checkerframework.common.returnsreceiver.qual.This;
+import org.checkerframework.framework.qual.*;
 
 final class AnnotatedConverters {
   public static final class AnnotatedConverterFactory extends Converter.Factory {
@@ -129,6 +134,7 @@ final class AnnotatedConverters {
   }
 
   public static void main(String... args) throws IOException {
+    @SuppressWarnings("calledmethods:required.method.not.called")  //This will be a resource leak if exception is thrown from start and shutdown is not called. 
     MockWebServer server = new MockWebServer();
     server.start();
     server.enqueue(new MockResponse().setBody("{\"name\": \"Moshi\"}"));
@@ -153,16 +159,19 @@ final class AnnotatedConverters {
             .addConverterFactory(gsonConverterFactory)
             .build();
     Service service = retrofit.create(Service.class);
-
+    /*
+     * For suppression annotation: There will be a resource leak if .execute().body() throws an exception.
+     */
+    @SuppressWarnings("calledmethods:required.method.not.called")
     Library library1 = service.exampleMoshi().execute().body();
     System.out.println("Library 1: " + library1.name);
-
+    @SuppressWarnings("calledmethods:required.method.not.called")
     Library library2 = service.exampleGson().execute().body();
     System.out.println("Library 2: " + library2.name);
-
+    @SuppressWarnings("calledmethods:required.method.not.called")
     Library library3 = service.exampleSimpleXml().execute().body();
     System.out.println("Library 3: " + library3.name);
-
+    @SuppressWarnings("calledmethods:required.method.not.called")
     Library library4 = service.exampleDefault().execute().body();
     System.out.println("Library 4: " + library4.name);
 

@@ -31,9 +31,13 @@ final class CallExecuteOnSubscribe<T> implements OnSubscribe<Response<T>> {
   CallExecuteOnSubscribe(Call<T> originalCall) {
     this.originalCall = originalCall;
   }
-
+  /*
+   * response has @Mustcall("close") but is never closed, therefore this is a resource leak.
+   * If the try-catch statment is successful, then the response will simply undergo a regular method exit without the resource being closed.
+   * arbiter.emitResponse(response) does not take ownership of the resource.
+   */
   @Override
-  @SuppressWarnings("calledmethods:required.method.not.called") //response has @Mustcall("close ") but is never closed, therefore this is a resource leak.
+  @SuppressWarnings("calledmethods:required.method.not.called")
   public void call(Subscriber<? super Response<T>> subscriber) {
     // Since Call is a one-shot type, clone it for each new subscriber.
     Call<T> call = originalCall.clone();

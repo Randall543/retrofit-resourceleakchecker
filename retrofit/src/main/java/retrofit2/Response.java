@@ -125,8 +125,8 @@ public final class Response<T> {
   @SuppressWarnings("calledmethods:required.method.not.called") //Resource leak checker can not guarentee that the call errorBody() will call close. This is a flase positive because the implementation of close is held by the type of errorbody and not the class it belongs to. 
   private final  @Nullable @Owning ResponseBody errorBody; 
   
-  private @MustCallAlias Response(
-     okhttp3.Response rawResponse,  @Nullable @MustCallAlias T body, @Nullable @MustCallAlias ResponseBody errorBody) {
+  private Response(
+     okhttp3.Response rawResponse, @Nullable @MustCallAlias T body, @Nullable @MustCallAlias ResponseBody errorBody) {
     this.rawResponse = rawResponse;
     this.body = body;
     this.errorBody = errorBody;

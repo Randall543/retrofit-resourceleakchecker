@@ -137,7 +137,6 @@ public final class Calls {
     }
 
     @Override
-    @SuppressWarnings("mustcall:return") // okhttp3.Response response.raw() needs to be closed however, response.raw().request() does not need to be closed therefore this is a false positive.
     public Request request() {
       if (response != null) {
         return response.raw().request();
