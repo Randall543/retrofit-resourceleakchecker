@@ -26,6 +26,11 @@ import retrofit2.Invocation;
 import retrofit2.Retrofit;
 import retrofit2.http.GET;
 import retrofit2.http.Url;
+import org.checkerframework.checker.mustcall.qual.*;
+import org.checkerframework.checker.calledmethods.qual.*;
+import org.checkerframework.dataflow.qual.SideEffectFree;
+import org.checkerframework.common.returnsreceiver.qual.This;
+import org.checkerframework.framework.qual.*;
 
 /** This example prints HTTP call metrics with the initiating method names and arguments. */
 public final class InvocationMetrics {
@@ -65,7 +70,7 @@ public final class InvocationMetrics {
       return response;
     }
   }
-
+  @SuppressWarnings("calledmethods:required.method.not.called")
   public static void main(String... args) throws IOException {
     InvocationLogger invocationLogger = new InvocationLogger();
 
@@ -75,10 +80,15 @@ public final class InvocationMetrics {
         new Retrofit.Builder().baseUrl("https://square.com/").callFactory(okHttpClient).build();
 
     Browse browse = retrofit.create(Browse.class);
-
+    /*
+     * Three methods below: A resource leak is possible is an exception is thrown from execute.
+     */
     browse.robots().execute();
     browse.favicon().execute();
     browse.home().execute();
+    /*
+     * Two methods below: It seems like the resources are not closed? If so then this is a resource leak. further investigation is needed to confirm this due to the type being retrofit2.Response<okhttp3.ResponseBody>.
+     */
     browse.page("sitemap.xml").execute();
     browse.page("notfound").execute();
   }

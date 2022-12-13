@@ -158,7 +158,8 @@ public final class Response<T> {
   }
 
   /** The deserialized response body of a {@linkplain #isSuccessful() successful} response. */
-  public @Nullable T body() {
+  @SuppressWarnings("mustcall:return")  //This is a false positive becauase the resource leak checker has trouble handing the @Mustcallunknown of T. The T of body should be aliased with the field of the same name since this is a getter method.
+  public @Nullable @MustCallAlias T body(@MustCallAlias Response<T> this) {
     return body;
   }
 

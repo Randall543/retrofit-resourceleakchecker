@@ -35,6 +35,11 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.simplexml.SimpleXmlConverterFactory;
 import retrofit2.http.GET;
+import org.checkerframework.checker.mustcall.qual.*;
+import org.checkerframework.checker.calledmethods.qual.*;
+import org.checkerframework.dataflow.qual.SideEffectFree;
+import org.checkerframework.common.returnsreceiver.qual.This;
+import org.checkerframework.framework.qual.*;
 
 /**
  * Both the Gson converter and the Simple Framework converter accept all types. Because of this, you
@@ -109,6 +114,7 @@ public final class JsonAndXmlConverters {
   }
 
   public static void main(String... args) throws IOException {
+    @SuppressWarnings("calledmethods:required.method.not.called") //There is a resource leak if .start() throws an exception.
     MockWebServer server = new MockWebServer();
     server.start();
     server.enqueue(new MockResponse().setBody("{\"name\": \"Jason\"}"));
@@ -122,10 +128,14 @@ public final class JsonAndXmlConverters {
                     GsonConverterFactory.create(), SimpleXmlConverterFactory.create()))
             .build();
     Service service = retrofit.create(Service.class);
-
+    /*
+    * 1) There is a resource leak if .execute() throws an exception'
+    * 2) It seeems like retrofit2.Response<com.example.retrofit.JsonAndXmlConverters.User> has not had closed called on it? If this is true then this is a resource leak, unless server.shutdown() frees all resources? (speak with prof)
+    */
+    @SuppressWarnings("calledmethods:required.method.not.called") //The method close() does not need to be called on a User Object. Flase positive. 
     User user1 = service.exampleJson().execute().body();
     System.out.println("User 1: " + user1.name);
-
+    @SuppressWarnings("calledmethods:required.method.not.called")   //The method close() does not need to be called on a User Object. Flase positive. 
     User user2 = service.exampleXml().execute().body();
     System.out.println("User 2: " + user2.name);
 

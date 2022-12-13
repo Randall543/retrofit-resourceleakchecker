@@ -35,6 +35,11 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
+import org.checkerframework.checker.mustcall.qual.*;
+import org.checkerframework.checker.calledmethods.qual.*;
+import org.checkerframework.dataflow.qual.SideEffectFree;
+import org.checkerframework.common.returnsreceiver.qual.This;
+import org.checkerframework.framework.qual.*;
 
 public final class JsonQueryParameters {
   @Retention(RUNTIME)
@@ -71,6 +76,7 @@ public final class JsonQueryParameters {
       }
 
       @Override
+      @SuppressWarnings("calledmethods:required.method.not.called") // If delegate.convert() throws an exception then a resource leak will occur because buffer will go out of scope without being closed.
       public String convert(T value) throws IOException {
         Buffer buffer = new Buffer();
         delegate.convert(value).writeTo(buffer);
@@ -94,6 +100,7 @@ public final class JsonQueryParameters {
 
   @SuppressWarnings("UnusedVariable")
   public static void main(String... args) throws IOException, InterruptedException {
+    @SuppressWarnings("calledmethods:required.method.not.called") //Should .start() throw an exception then a resouce leak will occur because server will not be shutdown.
     MockWebServer server = new MockWebServer();
     server.start();
     server.enqueue(new MockResponse());
@@ -106,6 +113,7 @@ public final class JsonQueryParameters {
     Service service = retrofit.create(Service.class);
 
     Call<ResponseBody> call = service.example(new Filter("123"));
+    @SuppressWarnings("calledmethods:required.method.not.called") // should .takerequest() throw an exception then a resource leak will occur because response will go out of scope without having it's resources closed.
     Response<ResponseBody> response = call.execute();
     // TODO handle user response...
 

@@ -15,6 +15,11 @@ import retrofit2.Retrofit;
 import retrofit2.mock.BehaviorDelegate;
 import retrofit2.mock.MockRetrofit;
 import retrofit2.mock.NetworkBehavior;
+import org.checkerframework.checker.mustcall.qual.*;
+import org.checkerframework.checker.calledmethods.qual.*;
+import org.checkerframework.dataflow.qual.SideEffectFree;
+import org.checkerframework.common.returnsreceiver.qual.This;
+import org.checkerframework.framework.qual.*;
 
 /**
  * An example of using {@link MockRetrofit} to create a mock service implementation with fake data.
@@ -65,19 +70,18 @@ public final class SimpleMockService {
       contributors.add(new Contributor(name, contributions));
     }
   }
-
   public static void main(String... args) throws IOException {
     // Create a very simple Retrofit adapter which points the GitHub API.
     Retrofit retrofit = new Retrofit.Builder().baseUrl(SimpleService.API_URL).build();
-
+    
     // Create a MockRetrofit object with a NetworkBehavior which manages the fake behavior of calls.
     NetworkBehavior behavior = NetworkBehavior.create();
     MockRetrofit mockRetrofit =
-        new MockRetrofit.Builder(retrofit).networkBehavior(behavior).build();
-
+    new MockRetrofit.Builder(retrofit).networkBehavior(behavior).build();
+    
     BehaviorDelegate<GitHub> delegate = mockRetrofit.create(GitHub.class);
     MockGitHub gitHub = new MockGitHub(delegate);
-
+    
     // Query for some contributors for a few repositories.
     printContributors(gitHub, "square", "retrofit");
     printContributors(gitHub, "square", "picasso");
@@ -86,15 +90,16 @@ public final class SimpleMockService {
     System.out.println("Adding more mock data...\n");
     gitHub.addContributor("square", "retrofit", "Foo Bar", 61);
     gitHub.addContributor("square", "picasso", "Kit Kat", 53);
-
+    
     // Reduce the delay to make the next calls complete faster.
     behavior.setDelay(500, TimeUnit.MILLISECONDS);
-
+    
     // Query for the contributors again so we can see the mock data that was added.
     printContributors(gitHub, "square", "retrofit");
     printContributors(gitHub, "square", "picasso");
   }
-
+  
+  @SuppressWarnings("calledmethods:required.method.not.called") //The resource contributors.execute().body() has not had method .close() called on it, therefore a resource leak will occur
   private static void printContributors(GitHub gitHub, String owner, String repo)
       throws IOException {
     System.out.println(String.format("== Contributors for %s/%s ==", owner, repo));
