@@ -66,13 +66,13 @@ public final class DynamicBaseUrl {
         new Retrofit.Builder().baseUrl("http://www.github.com/").callFactory(okHttpClient).build();
 
     Pop pop = retrofit.create(Pop.class);
-
+    @SuppressWarnings("calledmethods:required.method.not.called")  //This will be a resource leak should response1.body() throw an exception
     Response<ResponseBody> response1 = pop.robots().execute();
     System.out.println("Response from: " + response1.raw().request().url());
     System.out.println(response1.body().string());
 
     hostSelectionInterceptor.setHost("www.pepsi.com");
-
+    @SuppressWarnings("calledmethods:required.method.not.called")  //This will be a resource leak should response2.body() throw an exception
     Response<ResponseBody> response2 = pop.robots().execute();
     System.out.println("Response from: " + response2.raw().request().url());
     System.out.println(response2.body().string());

@@ -37,6 +37,11 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
+import org.checkerframework.checker.mustcall.qual.*;
+import org.checkerframework.checker.calledmethods.qual.*;
+import org.checkerframework.dataflow.qual.SideEffectFree;
+import org.checkerframework.common.returnsreceiver.qual.This;
+import org.checkerframework.framework.qual.*;
 
 public final class ChunkingConverter {
   @Target(PARAMETER)
@@ -103,11 +108,13 @@ public final class ChunkingConverter {
     Call<ResponseBody> sendChunked(@Chunked @Body Repo repo);
   }
 
+  @SuppressWarnings("calledmethods:required.method.not.called")
   public static void main(String... args) throws IOException, InterruptedException {
+    @SuppressWarnings("calledmethods:required.method.not.called")
     MockWebServer server = new MockWebServer();
     server.enqueue(new MockResponse());
     server.enqueue(new MockResponse());
-    server.start();
+    server.start();   //This will be a resource leak if exception is thrown from start and shutdown is not called. 
 
     Retrofit retrofit =
         new Retrofit.Builder()
@@ -120,12 +127,12 @@ public final class ChunkingConverter {
     Repo retrofitRepo = new Repo("square", "retrofit");
 
     service.sendNormal(retrofitRepo).execute();
-    RecordedRequest normalRequest = server.takeRequest();
+    RecordedRequest normalRequest = server.takeRequest(); //A resource leak will occur if an exception is thrown from server.takeRequest()
     System.out.println(
         "Normal @Body Transfer-Encoding: " + normalRequest.getHeader("Transfer-Encoding"));
 
     service.sendChunked(retrofitRepo).execute();
-    RecordedRequest chunkedRequest = server.takeRequest();
+    RecordedRequest chunkedRequest = server.takeRequest();  //A resource leak will occur if an exception is thrown from server.takeRequest()
     System.out.println(
         "@Chunked @Body Transfer-Encoding: " + chunkedRequest.getHeader("Transfer-Encoding"));
 

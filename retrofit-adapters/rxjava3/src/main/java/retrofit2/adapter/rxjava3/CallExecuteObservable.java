@@ -23,6 +23,10 @@ import io.reactivex.rxjava3.exceptions.Exceptions;
 import io.reactivex.rxjava3.plugins.RxJavaPlugins;
 import retrofit2.Call;
 import retrofit2.Response;
+import org.checkerframework.checker.mustcall.qual.*;
+import org.checkerframework.checker.calledmethods.qual.*;
+import org.checkerframework.dataflow.qual.SideEffectFree;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
 final class CallExecuteObservable<T> extends Observable<Response<T>> {
   private final Call<T> originalCall;
@@ -32,6 +36,7 @@ final class CallExecuteObservable<T> extends Observable<Response<T>> {
   }
 
   @Override
+  @SuppressWarnings("calledmethods:required.method.not.called") // This is a tricky situation due to the must call obligation dependent on T. (This needs further review)
   protected void subscribeActual(Observer<? super Response<T>> observer) {
     // Since Call is a one-shot type, clone it for each new observer.
     Call<T> call = originalCall.clone();

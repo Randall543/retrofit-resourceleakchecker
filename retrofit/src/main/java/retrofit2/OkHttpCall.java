@@ -29,6 +29,11 @@ import okio.BufferedSource;
 import okio.ForwardingSource;
 import okio.Okio;
 import okio.Timeout;
+import org.checkerframework.checker.mustcall.qual.*;
+import org.checkerframework.checker.calledmethods.qual.*;
+import org.checkerframework.framework.qual.*;
+import org.checkerframework.dataflow.qual.SideEffectFree;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
 final class OkHttpCall<T> implements Call<T> {
   private final RequestFactory requestFactory;
@@ -143,10 +148,10 @@ final class OkHttpCall<T> implements Call<T> {
     if (canceled) {
       call.cancel();
     }
-
     call.enqueue(
-        new okhttp3.Callback() {
-          @Override
+      new okhttp3.Callback() {
+        @Override
+        @SuppressWarnings("calledmethods:required.method.not.called") //Response<T> response will go out scope through callback.onResponse() does not take responsiblity for closing response and the resource will still be active. This is also anonymous class therefore there is no way to alias the constructor and response .//https://javadoc.io/doc/com.squareup.okhttp3/okhttp/3.14.9/okhttp3/Callback.html
           public void onResponse(okhttp3.Call call, okhttp3.Response rawResponse) {
             Response<T> response;
             try {
@@ -187,6 +192,7 @@ final class OkHttpCall<T> implements Call<T> {
   }
 
   @Override
+  @SuppressWarnings("mustcall:override.receiver")  //Purpose of annoation is to suppress the warning the checker throws when a implemention of Call<T> overrides this method. Full explanation is in the Call.Java file.
   public Response<T> execute() throws IOException {
     okhttp3.Call call;
 
@@ -211,8 +217,14 @@ final class OkHttpCall<T> implements Call<T> {
     }
     return call;
   }
-
-  Response<T> parseResponse(okhttp3.Response rawResponse) throws IOException {
+  /*
+   * Response.error() or Response.success()
+   * Both of these methods throw warnings because they take input annotated with @MustCall(close) then return @MustCall(errorBody). These warnings are false positives.
+   * This is done to communicate to the checker that the responsibily of closing the resources held by Response<T> is not owned by the mentioned class.
+   * Another reason is to communicate the different mustcall obligations of a success or error Response<T>.
+   */
+  @SuppressWarnings("mustcall:return")
+  Response<T> parseResponse( okhttp3.Response rawResponse) throws IOException {
     ResponseBody rawBody = rawResponse.body();
 
     // Remove the body's source (the only stateful object) so we can pass the response along.
@@ -227,7 +239,7 @@ final class OkHttpCall<T> implements Call<T> {
       try {
         // Buffer the entire body to avoid future I/O.
         ResponseBody bufferedBody = Utils.buffer(rawBody);
-        return Response.error(bufferedBody, rawResponse);
+        return Response.error(bufferedBody, rawResponse); 
       } finally {
         rawBody.close();
       }
@@ -240,7 +252,7 @@ final class OkHttpCall<T> implements Call<T> {
 
     ExceptionCatchingResponseBody catchingBody = new ExceptionCatchingResponseBody(rawBody);
     try {
-      T body = responseConverter.convert(catchingBody);
+      T body = responseConverter.convert(catchingBody); // this method essentially converts Responsebody to ExceptionCatchingResponseBody
       return Response.success(body, rawResponse);
     } catch (RuntimeException e) {
       // If the underlying source threw an exception, propagate that rather than indicating it was
@@ -272,11 +284,13 @@ final class OkHttpCall<T> implements Call<T> {
       return rawCall != null && rawCall.isCanceled();
     }
   }
-
+  @MustCall({})
+  @SuppressWarnings("mustcall:inconsistent.mustcall.subtype")  //Types of @MustCall({}) and @InheritableMustCall("close") are inconsistent, but child class has no need to be closed because there is no resource to close therefore this is a false positive.
   static final class NoContentResponseBody extends ResponseBody {
     private final @Nullable MediaType contentType;
     private final long contentLength;
 
+    @SuppressWarnings("mustcall:super.invocation") //The constructor @MustCall must match it's class.
     NoContentResponseBody(@Nullable MediaType contentType, long contentLength) {
       this.contentType = contentType;
       this.contentLength = contentLength;
@@ -297,17 +311,17 @@ final class OkHttpCall<T> implements Call<T> {
       throw new IllegalStateException("Cannot read raw response body of a converted body.");
     }
   }
-
   static final class ExceptionCatchingResponseBody extends ResponseBody {
-    private final ResponseBody delegate;
+    private final @Owning ResponseBody delegate;
     private final BufferedSource delegateSource;
     @Nullable IOException thrownException;
-
-    ExceptionCatchingResponseBody(ResponseBody delegate) {
+    @SuppressWarnings("mustcall:annotations.on.use") //Resource leak checker can not handle this situation. The Type and annotation are inconsistent due to anonymous class. [error: [annotations.on.use] invalid type: annotations [@PolyMustCall] conflict with declaration of type retrofit2.OkHttpCall.ExceptionCatchingResponseBody]
+    @MustCallAlias ExceptionCatchingResponseBody(@MustCallAlias ResponseBody delegate) {
       this.delegate = delegate;
       this.delegateSource =
           Okio.buffer(
-              new ForwardingSource(delegate.source()) {
+              new ForwardingSource(delegate.source())
+              {
                 @Override
                 public long read(Buffer sink, long byteCount) throws IOException {
                   try {
@@ -336,6 +350,7 @@ final class OkHttpCall<T> implements Call<T> {
     }
 
     @Override
+    @EnsuresCalledMethods(value = "delegate", methods = "close")
     public void close() {
       delegate.close();
     }

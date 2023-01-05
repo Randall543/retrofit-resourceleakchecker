@@ -24,6 +24,11 @@ import java.util.concurrent.Executor;
 import javax.annotation.Nullable;
 import okhttp3.Request;
 import okio.Timeout;
+import org.checkerframework.checker.mustcall.qual.*;
+import org.checkerframework.checker.calledmethods.qual.*;
+import org.checkerframework.framework.qual.*;
+import org.checkerframework.dataflow.qual.SideEffectFree;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
 final class DefaultCallAdapterFactory extends CallAdapter.Factory {
   private final @Nullable Executor callbackExecutor;
@@ -104,6 +109,7 @@ final class DefaultCallAdapterFactory extends CallAdapter.Factory {
     }
 
     @Override
+    @SuppressWarnings("mustcall:override.receiver")  //Purpose of annoation is to suppress the warning the checker throws when a implemention of Call<T> overrides this method. Full explanation is in the Call.Java file.
     public Response<T> execute() throws IOException {
       return delegate.execute();
     }

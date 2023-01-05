@@ -29,6 +29,10 @@ import retrofit2.CallAdapter;
 import retrofit2.KotlinExtensions;
 import retrofit2.Response;
 import retrofit2.Retrofit;
+import org.checkerframework.checker.mustcall.qual.*;
+import org.checkerframework.checker.calledmethods.qual.*;
+import org.checkerframework.dataflow.qual.SideEffectFree;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
 /**
  * Applies {@linkplain NetworkBehavior behavior} to responses and adapts them into the appropriate
@@ -54,8 +58,12 @@ public final class BehaviorDelegate<T> {
   public T returningResponse(@Nullable Object response) {
     return returning(Calls.response(response));
   }
-
-  @SuppressWarnings("unchecked") // Single-interface proxy creation guarded by parameter safety.
+  /*
+   *  Below are both false positives
+   *  ["mustcall:return"] is needed due to resource leak checker not being able to handle generics in [return adapted;]
+   *  [argument] The resource leak checker can not handle Kotlinextensions at this time.
+   */
+  @SuppressWarnings(value = {"unchecked","mustcall:return","mustcall:argument"}) // Single-interface proxy creation guarded by parameter safety.
   public <R> T returning(Call<R> call) {
     final Call<R> behaviorCall = new BehaviorCall<>(behavior, executor, call);
     return (T)

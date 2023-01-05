@@ -23,6 +23,11 @@ import okhttp3.ResponseBody;
 import okio.BufferedSource;
 import okio.ByteString;
 import retrofit2.Converter;
+import org.checkerframework.checker.mustcall.qual.*;
+import org.checkerframework.checker.calledmethods.qual.*;
+import org.checkerframework.dataflow.qual.SideEffectFree;
+import org.checkerframework.common.returnsreceiver.qual.This;
+import org.checkerframework.framework.qual.*;
 
 final class MoshiResponseBodyConverter<T> implements Converter<ResponseBody, T> {
   private static final ByteString UTF8_BOM = ByteString.decodeHex("EFBBBF");
@@ -34,7 +39,7 @@ final class MoshiResponseBodyConverter<T> implements Converter<ResponseBody, T> 
   }
 
   @Override
-  public T convert(ResponseBody value) throws IOException {
+  public T convert(@Owning ResponseBody value) throws IOException {
     BufferedSource source = value.source();
     try {
       // Moshi has no document-level API so the responsibility of BOM skipping falls to whatever

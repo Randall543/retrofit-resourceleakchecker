@@ -25,6 +25,10 @@ import javax.xml.stream.XMLStreamWriter;
 import okhttp3.RequestBody;
 import okio.Buffer;
 import retrofit2.Converter;
+import org.checkerframework.checker.mustcall.qual.*;
+import org.checkerframework.checker.calledmethods.qual.*;
+import org.checkerframework.dataflow.qual.SideEffectFree;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
 final class JaxbRequestConverter<T> implements Converter<T, RequestBody> {
   final XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
@@ -37,6 +41,7 @@ final class JaxbRequestConverter<T> implements Converter<T, RequestBody> {
   }
 
   @Override
+  @SuppressWarnings("calledmethods:required.method.not.called") // resource leak: buffer was not closed before going out of scope.
   public RequestBody convert(final T value) throws IOException {
     Buffer buffer = new Buffer();
     try {

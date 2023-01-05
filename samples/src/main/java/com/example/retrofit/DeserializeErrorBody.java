@@ -43,6 +43,7 @@ public final class DeserializeErrorBody {
 
   public static void main(String... args) throws IOException {
     // Create a local web server which response with a 404 and JSON body.
+    @SuppressWarnings("calledmethods:required.method.not.called")  //This will be a resource leak if exception is thrown from start and shutdown is not called. 
     MockWebServer server = new MockWebServer();
     server.start();
     server.enqueue(
@@ -57,7 +58,6 @@ public final class DeserializeErrorBody {
             .addConverterFactory(GsonConverterFactory.create())
             .build();
     Service service = retrofit.create(Service.class);
-
     Response<User> response = service.getUser().execute();
 
     // Normally you would check response.isSuccess() here before doing the following, but we know

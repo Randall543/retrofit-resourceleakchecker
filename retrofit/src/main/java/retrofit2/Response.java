@@ -21,11 +21,16 @@ import okhttp3.Headers;
 import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.ResponseBody;
+import org.checkerframework.checker.mustcall.qual.*;
+import org.checkerframework.checker.calledmethods.qual.*;
+import org.checkerframework.dataflow.qual.*;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
 /** An HTTP response. */
+@MustCall("errorBody")
 public final class Response<T> {
   /** Create a synthetic successful response with {@code body} as the deserialized body. */
-  public static <T> Response<T> success(@Nullable T body) {
+  public static <T> @MustCallAlias Response<T> success(@Nullable @MustCallAlias T body) {
     return success(
         body,
         new okhttp3.Response.Builder() //
@@ -40,7 +45,8 @@ public final class Response<T> {
    * Create a synthetic successful response with an HTTP status code of {@code code} and {@code
    * body} as the deserialized body.
    */
-  public static <T> Response<T> success(int code, @Nullable T body) {
+  @SuppressWarnings("calledmethods:mustcallalias.out.of.scope") //resource leak due to exeption thrown and reference to body will be out of scope.
+  public static <T> @MustCallAlias Response<T> success(int code, @Nullable @MustCallAlias T body) {
     if (code < 200 || code >= 300) {
       throw new IllegalArgumentException("code < 200 or >= 300: " + code);
     }
@@ -58,7 +64,8 @@ public final class Response<T> {
    * Create a synthetic successful response using {@code headers} with {@code body} as the
    * deserialized body.
    */
-  public static <T> Response<T> success(@Nullable T body, Headers headers) {
+  @SuppressWarnings("calledmethods:mustcallalias.out.of.scope") //Resource Leak : If exception is thrown then the only alias to body will be lost.
+   public static <T> @MustCallAlias Response<T> success(@Nullable @MustCallAlias T body, Headers headers) {
     Objects.requireNonNull(headers, "headers == null");
     return success(
         body,
@@ -75,10 +82,11 @@ public final class Response<T> {
    * Create a successful response from {@code rawResponse} with {@code body} as the deserialized
    * body.
    */
-  public static <T> Response<T> success(@Nullable T body, okhttp3.Response rawResponse) {
+  @SuppressWarnings("calledmethods:mustcallalias.out.of.scope") //Resource Leak : If exception is thrown then the only alias to body will be lost.
+  public static  <T> @MustCallAlias Response<T> success(@Nullable @MustCallAlias T body,  okhttp3.Response rawResponse) {
     Objects.requireNonNull(rawResponse, "rawResponse == null");
     if (!rawResponse.isSuccessful()) {
-      throw new IllegalArgumentException("rawResponse must be successful response");
+      throw new IllegalArgumentException("rawResponse must be successful response");  
     }
     return new Response<>(rawResponse, body, null);
   }
@@ -87,7 +95,8 @@ public final class Response<T> {
    * Create a synthetic error response with an HTTP status code of {@code code} and {@code body} as
    * the error body.
    */
-  public static <T> Response<T> error(int code, ResponseBody body) {
+  @SuppressWarnings("calledmethods:mustcallalias.out.of.scope") //resource leak due to exeption thrown and reference to body will be out of scope.
+  public static <T> @MustCallAlias Response<T> error(int code, @MustCallAlias ResponseBody body) {
     Objects.requireNonNull(body, "body == null");
     if (code < 400) throw new IllegalArgumentException("code < 400: " + code);
     return error(
@@ -102,28 +111,30 @@ public final class Response<T> {
   }
 
   /** Create an error response from {@code rawResponse} with {@code body} as the error body. */
-  public static <T> Response<T> error(ResponseBody body, okhttp3.Response rawResponse) {
+  @SuppressWarnings("calledmethods:mustcallalias.out.of.scope") //resource leak due to exeption thrown and reference to body will be out of scope.
+  public static  <T> @MustCallAlias Response<T> error( @MustCallAlias ResponseBody body, okhttp3.Response rawResponse) { // A rawResponse doesn't need to be closed. Holds no resource. 
     Objects.requireNonNull(body, "body == null");
     Objects.requireNonNull(rawResponse, "rawResponse == null");
     if (rawResponse.isSuccessful()) {
-      throw new IllegalArgumentException("rawResponse should not be successful response");
+      throw new IllegalArgumentException("rawResponse should not be successful response"); // This will cause a resource leak
     }
-    return new Response<>(rawResponse, null, body);
+    return new Response<>(rawResponse, null, body); //body must still be closed some way, some how.
   }
 
-  private final okhttp3.Response rawResponse;
-  private final @Nullable T body;
-  private final @Nullable ResponseBody errorBody;
-
+  private final  okhttp3.Response rawResponse;
+  private final  @Nullable @Owning T body;
+  @SuppressWarnings("calledmethods:required.method.not.called") // The method close does not exist because this class does not have responsibility in closing errorBody.
+  private final  @Nullable @Owning ResponseBody errorBody; 
+  
   private Response(
-      okhttp3.Response rawResponse, @Nullable T body, @Nullable ResponseBody errorBody) {
+     okhttp3.Response rawResponse, @Nullable @MustCallAlias T body, @Nullable @MustCallAlias ResponseBody errorBody) {
     this.rawResponse = rawResponse;
     this.body = body;
     this.errorBody = errorBody;
   }
 
   /** The raw response from the HTTP client. */
-  public okhttp3.Response raw() {
+  public @MustCallAlias okhttp3.Response raw(@MustCallAlias Response<T> this ) {
     return rawResponse;
   }
 
@@ -143,17 +154,20 @@ public final class Response<T> {
   }
 
   /** Returns true if {@link #code()} is in the range [200..300). */
+  @EnsuresCalledMethodsIf(expression = "this", methods = "errorBody", result=true)
+  @SuppressWarnings("calledmethods:contracts.conditional.postcondition")
   public boolean isSuccessful() {
     return rawResponse.isSuccessful();
   }
 
   /** The deserialized response body of a {@linkplain #isSuccessful() successful} response. */
-  public @Nullable T body() {
+  @SuppressWarnings("mustcall:return")  //This is a false positive becauase the resource leak checker has trouble handing the @Mustcallunknown of T. The T of body should be aliased with the field of the same name since this is a getter method.
+  public @Nullable @MustCallAlias T body(@MustCallAlias Response<T> this) {
     return body;
   }
 
   /** The raw response body of an {@linkplain #isSuccessful() unsuccessful} response. */
-  public @Nullable ResponseBody errorBody() {
+  public @Nullable @MustCallAlias ResponseBody errorBody( @MustCallAlias Response<T> this ) { //Calling close on the ResponseBody returned by errorBody() will ensure the resource in Response<T> will be closed.
     return errorBody;
   }
 

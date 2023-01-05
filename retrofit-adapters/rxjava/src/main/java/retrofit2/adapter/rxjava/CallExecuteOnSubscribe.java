@@ -20,6 +20,10 @@ import retrofit2.Response;
 import rx.Observable.OnSubscribe;
 import rx.Subscriber;
 import rx.exceptions.Exceptions;
+import org.checkerframework.checker.mustcall.qual.*;
+import org.checkerframework.checker.calledmethods.qual.*;
+import org.checkerframework.dataflow.qual.SideEffectFree;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
 final class CallExecuteOnSubscribe<T> implements OnSubscribe<Response<T>> {
   private final Call<T> originalCall;
@@ -29,6 +33,7 @@ final class CallExecuteOnSubscribe<T> implements OnSubscribe<Response<T>> {
   }
 
   @Override
+  @SuppressWarnings("calledmethods:required.method.not.called") //This may be potentially a resource leak since response is not checked for a successful response. Should a error response be given then this is a resource leak.
   public void call(Subscriber<? super Response<T>> subscriber) {
     // Since Call is a one-shot type, clone it for each new subscriber.
     Call<T> call = originalCall.clone();

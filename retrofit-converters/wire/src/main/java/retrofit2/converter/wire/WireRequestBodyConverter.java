@@ -22,6 +22,10 @@ import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okio.Buffer;
 import retrofit2.Converter;
+import org.checkerframework.checker.mustcall.qual.*;
+import org.checkerframework.checker.calledmethods.qual.*;
+import org.checkerframework.dataflow.qual.SideEffectFree;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
 final class WireRequestBodyConverter<T extends Message<T, ?>> implements Converter<T, RequestBody> {
   private static final MediaType MEDIA_TYPE = MediaType.get("application/x-protobuf");
@@ -33,6 +37,7 @@ final class WireRequestBodyConverter<T extends Message<T, ?>> implements Convert
   }
 
   @Override
+  @SuppressWarnings("calledmethods:required.method.not.called") // resource leak: If .encode() throws an exception then the only alias to buffer will be lost causing a resource leak.
   public RequestBody convert(T value) throws IOException {
     Buffer buffer = new Buffer();
     adapter.encode(buffer, value);

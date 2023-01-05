@@ -42,6 +42,10 @@ import retrofit2.http.GET;
 import retrofit2.http.HTTP;
 import retrofit2.http.Header;
 import retrofit2.http.Url;
+import org.checkerframework.checker.mustcall.qual.*;
+import org.checkerframework.checker.calledmethods.qual.*;
+import org.checkerframework.dataflow.qual.*;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
 /**
  * Retrofit adapts a Java interface to HTTP calls by using annotations on the declared methods to
@@ -151,8 +155,9 @@ public final class Retrofit {
             new Class<?>[] {service},
             new InvocationHandler() {
               private final Object[] emptyArgs = new Object[0];
-
+              
               @Override
+              @SuppressWarnings("mustcall:return") // Suppressed due to [error: [return] incompatible types in return.] and resource leak checker does not handle this warning. (Discussed with professor already).
               public @Nullable Object invoke(Object proxy, Method method, @Nullable Object[] args)
                   throws Throwable {
                 // If the method is a method from Object then defer to normal invocation.
@@ -420,7 +425,7 @@ public final class Retrofit {
     return callbackExecutor;
   }
 
-  public Builder newBuilder() {
+  public Builder newBuilder() { //this makes a shallow-copy of the builder that calls it.
     return new Builder(this);
   }
 

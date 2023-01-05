@@ -32,6 +32,11 @@ import javax.annotation.Nullable;
 import kotlin.Unit;
 import okhttp3.ResponseBody;
 import okio.Buffer;
+import org.checkerframework.common.returnsreceiver.qual.This;
+import org.checkerframework.checker.mustcall.qual.*;
+import org.checkerframework.checker.calledmethods.qual.*;
+import org.checkerframework.dataflow.qual.*;
+
 
 final class Utils {
   static final Type[] EMPTY_TYPE_ARRAY = new Type[0];
@@ -319,8 +324,8 @@ final class Utils {
     }
     return false;
   }
-
-  static ResponseBody buffer(final ResponseBody body) throws IOException {
+  @SuppressWarnings("calledmethods:required.method.not.called")  // If readall throws an IOExecption then buffer will be left hanging without any alias, therefore this is a resource leak.
+  static ResponseBody buffer(final ResponseBody body) throws IOException {  
     Buffer buffer = new Buffer();
     body.source().readAll(buffer);
     return ResponseBody.create(body.contentType(), body.contentLength(), buffer);

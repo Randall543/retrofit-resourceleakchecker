@@ -43,7 +43,7 @@ public interface Converter<F, T> {
   T convert(F value) throws IOException;
 
   /** Creates {@link Converter} instances based on a type and target usage. */
-  abstract class Factory {
+  abstract class Factory { 
     /**
      * Returns a {@link Converter} for converting an HTTP response body to {@code type}, or null if
      * {@code type} cannot be handled by this factory. This is used to create converters for

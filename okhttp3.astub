@@ -1,0 +1,73 @@
+import org.checkerframework.checker.mustcall.qual.*;
+import org.checkerframework.checker.calledmethods.qual.*;
+import org.checkerframework.dataflow.qual.SideEffectFree;
+import org.checkerframework.common.returnsreceiver.qual.This;
+import org.checkerframework.framework.qual.*;
+
+package okhttp3;
+
+
+class Response{
+    @Owning ResponseBody body;
+
+    @MustCall({})   //a okhttp3.Request does not need to be closed because it holds no resource.
+    Request request(Response this);
+    
+    @MustCallAlias ResponseBody body(@MustCallAlias Response this);
+    @MustCallAlias Response.Builder newBuilder(@MustCallAlias Response this); //This is used to connected the shallow-copy created to the Builder Constructor.
+
+    //Builder class does not need to be closed unless the method "body" is called, otherwise Response has no resource to close.
+    // @MustCall("close")
+    class Builder{
+        @MustCall({})
+        public  Builder();
+        
+
+        public @MustCallAlias  Builder request(        @MustCallAlias  Builder this,  Request request);
+        public @MustCallAlias  Builder protocol(       @MustCallAlias  Builder this, Protocol protocol);
+        public @MustCallAlias  Builder code(           @MustCallAlias  Builder this, int code);
+        public @MustCallAlias  Builder message(        @MustCallAlias  Builder this, String message);
+        public @MustCallAlias  Builder handshake(      @MustCallAlias  Builder this, Handshake handshake);
+        public @MustCallAlias  Builder header(         @MustCallAlias  Builder this, String name , String value );
+        public @MustCallAlias  Builder addHeader(      @MustCallAlias  Builder this, String name, String value);
+        public @MustCallAlias  Builder removeHeader(   @MustCallAlias  Builder this, String name);
+        public @MustCallAlias  Builder headers(        @MustCallAlias  Builder this, Headers headers );
+        
+        //  @MustCall("close")  //method responseable for determining Builder's MustCall obligation.
+        public @MustCallAlias Builder body( Builder this, @MustCallAlias ResponseBody body);
+        
+        public @MustCallAlias Builder networkResponse( @MustCallAlias Builder this, Response networkResponse);
+        public @MustCallAlias Builder cacheResponse(   @MustCallAlias Builder this, Response cacheResponse );
+        public @MustCallAlias Builder priorResponse(   @MustCallAlias Builder this, Response priorResponse );
+
+        // @MustCall({})
+        public @MustCallAlias Response build(          @MustCallAlias Builder this);
+    }
+
+}
+
+class ResponseBody{
+    //  Used to associated the BufferedSource field variable with the BufferedSource returned by the methods.
+    @MustCallAlias BufferedSource source(@MustCallAlias ResponseBody this);
+    @MustCallAlias Reader charStream(@MustCallAlias ResponseBody this);
+    @MustCallAlias InputStream byteStream(@MustCallAlias ResponseBody this);
+    
+    //Call of the function will guarantee the closure of the resource since they are equivalent to close()
+    @EnsuresCalledMethods(value = "This", methods = {"close"})
+    byte[] bytes();
+    
+    //Call of the function will guarantee the closure of the resource since they are equivalent to close()
+    @EnsuresCalledMethods (value = "this", methods = {"close"})
+    String string(ResponseBody this);
+
+    @CalledMethods("close")
+    void close();
+
+}
+
+class Call{
+    //  Used to associated the Response field variable in Call with the Response object returned by the method.
+    @MustCallAlias Response execute(@MustCallAlias Call this);
+}
+
+

@@ -23,6 +23,10 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
+import org.checkerframework.checker.mustcall.qual.*;
+import org.checkerframework.checker.calledmethods.qual.*;
+import org.checkerframework.dataflow.qual.SideEffectFree;
+import org.checkerframework.common.returnsreceiver.qual.This;
 
 /**
  * A simple emulation of the behavior of network calls.
@@ -69,8 +73,9 @@ public final class NetworkBehavior {
   private volatile int failurePercent = DEFAULT_FAILURE_PERCENT;
   private volatile Throwable failureException;
   private volatile int errorPercent = DEFAULT_ERROR_PERCENT;
+  @SuppressWarnings(value={"calledmethods:required.method.not.called","mustcall:return"})
   private volatile Callable<Response<?>> errorFactory =
-      () -> Response.error(500, ResponseBody.create(null, new byte[0]));
+      () -> Response.error(500, ResponseBody.create(null, new byte[0]));  //False error due to checker handling lambda expression
 
   private NetworkBehavior(Random random) {
     this.random = random;

@@ -1,0 +1,19 @@
+import org.checkerframework.checker.mustcall.qual.*;
+import org.checkerframework.checker.calledmethods.qual.*;
+import org.checkerframework.dataflow.qual.SideEffectFree;
+import org.checkerframework.common.returnsreceiver.qual.This;
+import org.checkerframework.framework.qual.*;
+
+package com.squareup.moshi;
+
+class JsonWriter{
+    public @MustCallAlias JsonWriter of(@MustCallAlias okio.BufferedSource sink);
+}
+
+class JsonAdapter<T>{
+    public void toJson(okio.BufferedSink sink, T value);
+}
+
+class JsonReader{
+    static @MustCallAlias JsonReader of(@MustCallAlias okio.BufferedSource source);
+}

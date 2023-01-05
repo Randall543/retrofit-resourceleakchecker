@@ -1,0 +1,18 @@
+import org.checkerframework.checker.mustcall.qual.*;
+import org.checkerframework.checker.calledmethods.qual.*;
+import org.checkerframework.dataflow.qual.SideEffectFree;
+import org.checkerframework.common.returnsreceiver.qual.This;
+
+package okio;
+
+class Okio{
+    public @MustCallAlias BufferedSource buffer(@MustCallAlias Source source);
+}
+
+class Buffer{
+    public @MustCallAlias java.io.OutputStream outputStream(@MustCallAlias Buffer this);
+}
+
+class ForwardingSource{
+    public @MustCallAlias ForwardingSource(@MustCallAlias Source delegate);
+}

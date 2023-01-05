@@ -29,6 +29,9 @@ import okio.Timeout;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import org.checkerframework.checker.mustcall.qual.*;
+import org.checkerframework.checker.calledmethods.qual.*;
+
 
 final class BehaviorCall<T> implements Call<T> {
   final NetworkBehavior behavior;
@@ -89,6 +92,7 @@ final class BehaviorCall<T> implements Call<T> {
               }
 
               @Override
+              @SuppressWarnings("calledmethods:required.method.not.called")   //BehaviorCall.this, (Response<T>) behavior.createErrorResponse()); This line doesn't need to be closed. The false positive is caused by the cast to Response<T>.
               public void run() {
                 if (canceled) {
                   callback.onFailure(BehaviorCall.this, new IOException("canceled"));
@@ -130,6 +134,7 @@ final class BehaviorCall<T> implements Call<T> {
   }
 
   @Override
+  @SuppressWarnings("mustcall:override.receiver")  //Purpose of annoation is to suppress the warning the checker throws when a implemention of Call<T> overrides this method. Full explanation is in the Call.Java file.
   public Response<T> execute() throws IOException {
     final AtomicReference<Response<T>> responseRef = new AtomicReference<>();
     final AtomicReference<Throwable> failureRef = new AtomicReference<>();

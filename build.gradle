@@ -22,6 +22,7 @@ plugins {
   alias(libs.plugins.protobuf) apply false
   alias(libs.plugins.animalsniffer) apply false
   alias(libs.plugins.googleJavaFormat) apply false
+  id 'org.checkerframework' version '0.6.16' apply false
 }
 
 subprojects {
@@ -47,10 +48,19 @@ subprojects {
   }
 
   apply plugin: 'net.ltgt.errorprone'
+  apply plugin: 'org.checkerframework'
+  
+  checkerFramework {
+    extraJavacArgs = [
+      '-Astubs=/mnt/c/Users/randa/Documents/LangCode/JavaCode/ResearchProject3/retrofit-resourceleakchecker/okio.astub:/mnt/c/Users/randa/Documents/LangCode/JavaCode/ResearchProject3/retrofit-resourceleakchecker/okhttp3.astub:/mnt/c/Users/randa/Documents/LangCode/JavaCode/ResearchProject3/retrofit-resourceleakchecker/gson.astub:/mnt/c/Users/randa/Documents/LangCode/JavaCode/ResearchProject3/retrofit-resourceleakchecker/squareup.astub'
+    ]
+    checkers = ['org.checkerframework.checker.resourceleak.ResourceLeakChecker']
+  }
 
   dependencies {
     errorproneJavac libs.errorproneJavac
     errorprone libs.errorproneCore
+    checkerFramework 'org.checkerframework:checker:3.25.0'
   }
 
   tasks.withType(JavaCompile).configureEach { task ->
