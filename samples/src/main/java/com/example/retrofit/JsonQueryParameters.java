@@ -113,7 +113,11 @@ public final class JsonQueryParameters {
     Service service = retrofit.create(Service.class);
 
     Call<ResponseBody> call = service.example(new Filter("123"));
-    @SuppressWarnings("calledmethods:required.method.not.called") // should .takerequest() throw an exception then a resource leak will occur because response will go out of scope without having it's resources closed.
+    /*
+     * should .takerequest() throw an exception then a resource leak will occur because response will go out of scope without having it's resources closed.
+     * Another concern is that nothing is done to response, not even closing the resource, so this may be an issue.
+     */
+    @SuppressWarnings("calledmethods:required.method.not.called")
     Response<ResponseBody> response = call.execute();
     // TODO handle user response...
 

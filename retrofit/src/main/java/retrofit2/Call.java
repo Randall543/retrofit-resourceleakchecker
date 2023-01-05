@@ -18,6 +18,11 @@ package retrofit2;
 import java.io.IOException;
 import okhttp3.Request;
 import okio.Timeout;
+import org.checkerframework.checker.mustcall.qual.*;
+import org.checkerframework.checker.calledmethods.qual.*;
+import org.checkerframework.dataflow.qual.SideEffectFree;
+import org.checkerframework.common.returnsreceiver.qual.This;
+import org.checkerframework.framework.qual.*;
 
 /**
  * An invocation of a Retrofit method that sends a request to a webserver and returns a response.
@@ -40,7 +45,11 @@ public interface Call<T> extends Cloneable {
    * @throws RuntimeException (and subclasses) if an unexpected error occurs creating the request or
    *     decoding the response.
    */
-  Response<T> execute() throws IOException;
+  /*
+   * The purpose of adding @MustCallAlias here to to ensure that the generic response returned and
+   * generic call parameter are aliased regardeless of implemenation.
+   */
+  @MustCallAlias Response<T> execute(@MustCallAlias Call<T> this) throws IOException;
 
   /**
    * Asynchronously send the request and notify {@code callback} of its response or if an error

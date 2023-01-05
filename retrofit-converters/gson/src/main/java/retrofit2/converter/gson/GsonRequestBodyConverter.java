@@ -31,9 +31,6 @@ import org.checkerframework.checker.mustcall.qual.*;
 import org.checkerframework.checker.calledmethods.qual.*;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.common.returnsreceiver.qual.This;
-import org.checkerframework.framework.qual.*;
-
-
 final class GsonRequestBodyConverter<T> implements Converter<T, RequestBody> {
   private static final MediaType MEDIA_TYPE = MediaType.get("application/json; charset=UTF-8");
 
@@ -46,7 +43,7 @@ final class GsonRequestBodyConverter<T> implements Converter<T, RequestBody> {
   }
 
   @Override
-  @SuppressWarnings("calledmethods:required.method.not.called") // resource leak is possible if gson.newJsonWriter(writer) throws an exception, therefore a resourceleak will occur.
+  @SuppressWarnings("calledmethods:required.method.not.called") // Resource leak will occur should gson.newJsonWriter(writer) throw an exception.
   public RequestBody convert(T value) throws IOException {
     Buffer buffer = new Buffer();
     Writer writer = new OutputStreamWriter(buffer.outputStream(), UTF_8);

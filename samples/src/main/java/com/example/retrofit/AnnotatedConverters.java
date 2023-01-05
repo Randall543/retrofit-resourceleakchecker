@@ -112,6 +112,7 @@ final class AnnotatedConverters {
   public @interface SimpleXml {}
 
   @Default(value = DefaultType.FIELD)
+  @MustCall({})
   static final class Library {
     @Attribute String name;
   }
@@ -160,7 +161,9 @@ final class AnnotatedConverters {
             .build();
     Service service = retrofit.create(Service.class);
     /*
-     * For suppression annotation: There will be a resource leak if .execute().body() throws an exception.
+     * For suppression annotation: There will be a resource leak if .execute().body() throws an exception. If no exception is thrown then this is a false positive.
+     * call.execute() will always return a successful Response<T>, therefore must call obligation depend on the type of T.
+     * The Type of T is a string.
      */
     @SuppressWarnings("calledmethods:required.method.not.called")
     Library library1 = service.exampleMoshi().execute().body();

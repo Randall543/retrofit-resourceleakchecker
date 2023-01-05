@@ -99,7 +99,7 @@ public final class SimpleMockService {
     printContributors(gitHub, "square", "picasso");
   }
   
-  @SuppressWarnings("calledmethods:required.method.not.called") //The resource contributors.execute().body() has not had method .close() called on it, therefore a resource leak will occur
+  // @SuppressWarnings("calledmethods:required.method.not.called") //This is a false positive because the tyep of T in Response<T> has @MustCall({}) obligation. Call<T>.execute() always returns a successful Response<T>.
   private static void printContributors(GitHub gitHub, String owner, String repo)
       throws IOException {
     System.out.println(String.format("== Contributors for %s/%s ==", owner, repo));

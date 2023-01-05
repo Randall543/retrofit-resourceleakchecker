@@ -26,7 +26,6 @@ import org.checkerframework.checker.mustcall.qual.*;
 import org.checkerframework.checker.calledmethods.qual.*;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.common.returnsreceiver.qual.This;
-import org.checkerframework.framework.qual.*;
 
 final class SimpleXmlRequestBodyConverter<T> implements Converter<T, RequestBody> {
   private static final MediaType MEDIA_TYPE = MediaType.get("application/xml; charset=UTF-8");
@@ -39,7 +38,7 @@ final class SimpleXmlRequestBodyConverter<T> implements Converter<T, RequestBody
   }
 
   @Override
-  @SuppressWarnings("calledmethods:required.method.not.called") // If throw e is executed then the reference to buffer and osw will be lost, therefore this is a potential resource leak.
+  @SuppressWarnings("calledmethods:required.method.not.called") //Resource leak will occur should a error be thrown then caught by the catch block. The buffer needs to have closed called should an exception be thrown.
   public RequestBody convert(T value) throws IOException {
     Buffer buffer = new Buffer();
     try {

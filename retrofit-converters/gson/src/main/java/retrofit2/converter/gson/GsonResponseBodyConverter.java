@@ -23,10 +23,6 @@ import com.google.gson.stream.JsonToken;
 import java.io.IOException;
 import okhttp3.ResponseBody;
 import retrofit2.Converter;
-import org.checkerframework.checker.mustcall.qual.*;
-import org.checkerframework.checker.calledmethods.qual.*;
-import org.checkerframework.dataflow.qual.SideEffectFree;
-import org.checkerframework.common.returnsreceiver.qual.This;
 
 final class GsonResponseBodyConverter<T> implements Converter<ResponseBody, T> {
   private final Gson gson;
@@ -38,7 +34,7 @@ final class GsonResponseBodyConverter<T> implements Converter<ResponseBody, T> {
   }
 
   @Override
-  public T convert(@Owning ResponseBody value) throws IOException {
+  public T convert(ResponseBody value) throws IOException {
     JsonReader jsonReader = gson.newJsonReader(value.charStream());
     try {
       T result = adapter.read(jsonReader);

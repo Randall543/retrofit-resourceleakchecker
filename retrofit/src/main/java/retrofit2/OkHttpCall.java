@@ -120,10 +120,10 @@ final class OkHttpCall<T> implements Call<T> {
   @Override
   public void enqueue(final Callback<T> callback) {
     Objects.requireNonNull(callback, "callback == null");
-    
+
     okhttp3.Call call;
     Throwable failure;
-    
+
     synchronized (this) {
       if (executed) throw new IllegalStateException("Already executed.");
       executed = true;
@@ -139,12 +139,12 @@ final class OkHttpCall<T> implements Call<T> {
         }
       }
     }
-    
+
     if (failure != null) {
       callback.onFailure(this, failure);
       return;
     }
-    
+
     if (canceled) {
       call.cancel();
     }
@@ -192,6 +192,7 @@ final class OkHttpCall<T> implements Call<T> {
   }
 
   @Override
+  @SuppressWarnings("mustcall:override.receiver")  //Purpose of annoation is to suppress the warning the checker throws when a implemention of Call<T> overrides this method. Full explanation is in the Call.Java file.
   public Response<T> execute() throws IOException {
     okhttp3.Call call;
 
@@ -216,14 +217,13 @@ final class OkHttpCall<T> implements Call<T> {
     }
     return call;
   }
-  /**
-   *  error: [return] incompatible types in return.
-      return Response.success(body, rawResponse);
-                             ^
-  type of expression: @MustCallUnknown Response<T extends @MustCallUnknown Object>
-  method return type: @MustCall("close") Response<T extends @MustCallUnknown Object>
+  /*
+   * Response.error() or Response.success()
+   * Both of these methods throw warnings because they take input annotated with @MustCall(close) then return @MustCall(errorBody). These warnings are false positives.
+   * This is done to communicate to the checker that the responsibily of closing the resources held by Response<T> is not owned by the mentioned class.
+   * Another reason is to communicate the different mustcall obligations of a success or error Response<T>.
    */
-  @SuppressWarnings("mustcall:return")  //The checker has trouble handling generics. This is a false positive.  Review.
+  @SuppressWarnings("mustcall:return")
   Response<T> parseResponse( okhttp3.Response rawResponse) throws IOException {
     ResponseBody rawBody = rawResponse.body();
 
@@ -238,7 +238,7 @@ final class OkHttpCall<T> implements Call<T> {
     if (code < 200 || code >= 300) {
       try {
         // Buffer the entire body to avoid future I/O.
-        ResponseBody bufferedBody = Utils.buffer(rawBody); 
+        ResponseBody bufferedBody = Utils.buffer(rawBody);
         return Response.error(bufferedBody, rawResponse); 
       } finally {
         rawBody.close();
@@ -320,7 +320,7 @@ final class OkHttpCall<T> implements Call<T> {
       this.delegate = delegate;
       this.delegateSource =
           Okio.buffer(
-              new ForwardingSource(delegate.source()) 
+              new ForwardingSource(delegate.source())
               {
                 @Override
                 public long read(Buffer sink, long byteCount) throws IOException {
@@ -348,7 +348,7 @@ final class OkHttpCall<T> implements Call<T> {
     public BufferedSource source() {
       return delegateSource;
     }
-    
+
     @Override
     @EnsuresCalledMethods(value = "delegate", methods = "close")
     public void close() {

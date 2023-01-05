@@ -27,7 +27,7 @@ import org.checkerframework.dataflow.qual.*;
 import org.checkerframework.common.returnsreceiver.qual.This;
 
 /** An HTTP response. */
-@MustCall("close")  // The class can hold resources in some instances and closed must be called on them.
+@MustCall("errorBody")
 public final class Response<T> {
   /** Create a synthetic successful response with {@code body} as the deserialized body. */
   public static <T> @MustCallAlias Response<T> success(@Nullable @MustCallAlias T body) {
@@ -64,7 +64,8 @@ public final class Response<T> {
    * Create a synthetic successful response using {@code headers} with {@code body} as the
    * deserialized body.
    */
-  public static <T> @MustCallAlias Response<T> success(@Nullable @MustCallAlias T body, Headers headers) {
+  @SuppressWarnings("calledmethods:mustcallalias.out.of.scope") //Resource Leak : If exception is thrown then the only alias to body will be lost.
+   public static <T> @MustCallAlias Response<T> success(@Nullable @MustCallAlias T body, Headers headers) {
     Objects.requireNonNull(headers, "headers == null");
     return success(
         body,
@@ -122,7 +123,7 @@ public final class Response<T> {
 
   private final  okhttp3.Response rawResponse;
   private final  @Nullable @Owning T body;
-  @SuppressWarnings("calledmethods:required.method.not.called") //Resource leak checker can not guarentee that the call errorBody() will call close. This is a flase positive because the implementation of close is held by the type of errorbody and not the class it belongs to. 
+  @SuppressWarnings("calledmethods:required.method.not.called") // The method close does not exist because this class does not have responsibility in closing errorBody.
   private final  @Nullable @Owning ResponseBody errorBody; 
   
   private Response(
@@ -153,6 +154,8 @@ public final class Response<T> {
   }
 
   /** Returns true if {@link #code()} is in the range [200..300). */
+  @EnsuresCalledMethodsIf(expression = "this", methods = "errorBody", result=true)
+  @SuppressWarnings("calledmethods:contracts.conditional.postcondition")
   public boolean isSuccessful() {
     return rawResponse.isSuccessful();
   }

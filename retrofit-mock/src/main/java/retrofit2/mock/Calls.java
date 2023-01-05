@@ -79,6 +79,7 @@ public final class Calls {
     }
 
     @Override
+    @SuppressWarnings("mustcall:override.receiver")  //Purpose of annoation is to suppress the warning the checker throws when a implemention of Call<T> overrides this method. Full explanation is in the Call.Java file.
     public Response<T> execute() throws IOException {
       if (!executed.compareAndSet(false, true)) {
         throw new IllegalStateException("Already executed");
@@ -172,6 +173,7 @@ public final class Calls {
     }
 
     @Override
+    @SuppressWarnings("mustcall:override.receiver")  //Purpose of annoation is to suppress the warning the checker throws when a implemention of Call<T> overrides this method. Full explanation is in the Call.Java file.
     public Response<T> execute() throws IOException {
       return getDelegate().execute();
     }

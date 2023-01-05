@@ -67,15 +67,6 @@ import org.checkerframework.common.returnsreceiver.qual.This;
  * @author Bob Lee (bob@squareup.com)
  * @author Jake Wharton (jw@squareup.com)
  */
-/*  
- * /mnt/c/Users/randa/Documents/LangCode/JavaCode/ResearchProject3/retrofit-resourceleakchecker/retrofit/src/main/java/retrofit2/Retrofit.java:170: error: [return] incompatible types in return.
-                    ? platform.invokeDefaultMethod(method, service, proxy, args)
-                    ^
-  type of expression: @MustCallUnknown Object
-  method return type: @MustCall Object
-
- */
-// @SuppressWarnings("return") //Warning description is shown above
 public final class Retrofit {
   private final Map<Method, ServiceMethod<?>> serviceMethodCache = new ConcurrentHashMap<>();
 

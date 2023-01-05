@@ -58,7 +58,6 @@ public final class DeserializeErrorBody {
             .addConverterFactory(GsonConverterFactory.create())
             .build();
     Service service = retrofit.create(Service.class);
-    @SuppressWarnings("calledmethods:required.method.not.called")  //This will be a resource leak should .convert(response.errorbody()) throw an exception.
     Response<User> response = service.getUser().execute();
 
     // Normally you would check response.isSuccess() here before doing the following, but we know
@@ -69,7 +68,6 @@ public final class DeserializeErrorBody {
     Converter<ResponseBody, ErrorBody> errorConverter =
         retrofit.responseBodyConverter(ErrorBody.class, new Annotation[0]);
     // Convert the error body into our Error type.
-    @SuppressWarnings("calledmethods:required.method.not.called")  //This will be a resource leak should .convert() throw an exception.
     ErrorBody errorBody = errorConverter.convert(response.errorBody());
     System.out.println("ERROR: " + errorBody.message);
 

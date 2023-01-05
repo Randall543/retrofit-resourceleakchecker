@@ -129,13 +129,12 @@ public final class JsonAndXmlConverters {
             .build();
     Service service = retrofit.create(Service.class);
     /*
-    * 1) There is a resource leak if .execute() throws an exception'
-    * 2) It seeems like retrofit2.Response<com.example.retrofit.JsonAndXmlConverters.User> has not had closed called on it? If this is true then this is a resource leak, unless server.shutdown() frees all resources? (speak with prof)
+    *   There is a resource leak if .execute() throws an exception. The Type is a successful Response<T>, therefore the mustcall obligations is dependant on T.
     */
     @SuppressWarnings("calledmethods:required.method.not.called") //The method close() does not need to be called on a User Object. Flase positive. 
     User user1 = service.exampleJson().execute().body();
     System.out.println("User 1: " + user1.name);
-    @SuppressWarnings("calledmethods:required.method.not.called")   //The method close() does not need to be called on a User Object. Flase positive. 
+    @SuppressWarnings("calledmethods:required.method.not.called") //The method close() does not need to be called on a User Object. Flase positive.
     User user2 = service.exampleXml().execute().body();
     System.out.println("User 2: " + user2.name);
 

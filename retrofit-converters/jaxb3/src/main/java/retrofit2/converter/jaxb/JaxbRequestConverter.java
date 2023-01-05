@@ -29,7 +29,6 @@ import org.checkerframework.checker.mustcall.qual.*;
 import org.checkerframework.checker.calledmethods.qual.*;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.common.returnsreceiver.qual.This;
-import org.checkerframework.framework.qual.*;
 
 final class JaxbRequestConverter<T> implements Converter<T, RequestBody> {
   final XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
@@ -42,8 +41,8 @@ final class JaxbRequestConverter<T> implements Converter<T, RequestBody> {
   }
 
   @Override
+  @SuppressWarnings("calledmethods:required.method.not.called") // resource leak: buffer was not closed before going out of scope.
   public RequestBody convert(final T value) throws IOException {
-    @SuppressWarnings("calledmethods:required.method.not.called") // buffer is not closed, therefore this is a resource leak.
     Buffer buffer = new Buffer();
     try {
       Marshaller marshaller = context.createMarshaller();

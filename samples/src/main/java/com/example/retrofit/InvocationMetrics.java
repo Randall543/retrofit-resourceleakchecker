@@ -70,7 +70,7 @@ public final class InvocationMetrics {
       return response;
     }
   }
-  @SuppressWarnings("calledmethods:required.method.not.called")
+  // @SuppressWarnings("calledmethods:required.method.not.called")
   public static void main(String... args) throws IOException {
     InvocationLogger invocationLogger = new InvocationLogger();
 
@@ -81,13 +81,16 @@ public final class InvocationMetrics {
 
     Browse browse = retrofit.create(Browse.class);
     /*
-     * Three methods below: A resource leak is possible is an exception is thrown from execute.
+     * Three methods below: A resource leak is possible if an exception is thrown from execute.
      */
     browse.robots().execute();
     browse.favicon().execute();
     browse.home().execute();
     /*
-     * Two methods below: It seems like the resources are not closed? If so then this is a resource leak. further investigation is needed to confirm this due to the type being retrofit2.Response<okhttp3.ResponseBody>.
+     * The two methods below are false positives.
+     * The reason is for the callfactory's parameter being okHttpClient and it ensuring the resources held by the call instances below will automatically
+     * be released after a period of time being idle.
+     * This is documented in https://javadoc.io/doc/com.squareup.okhttp3/okhttp/3.14.9/okhttp3/OkHttpClient.html and in Retrofit.Java file.
      */
     browse.page("sitemap.xml").execute();
     browse.page("notfound").execute();

@@ -61,7 +61,7 @@ public final class SimpleService {
     Call<List<Contributor>> call = github.contributors("square", "retrofit");
     
     // Fetch and print a list of the contributors to the library.
-    @SuppressWarnings("calledmethods:required.method.not.called") // This is a resource leak because methoed .close() has not been called on contributors.
+    // @SuppressWarnings("calledmethods:required.method.not.called") // The call.execute() always returns a successful Response<T>, therefore mustcall obigations depend on T. False positive.
     List<Contributor> contributors = call.execute().body();
     for (Contributor contributor : contributors) {
       System.out.println(contributor.login + " (" + contributor.contributions + ")");
